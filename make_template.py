@@ -301,7 +301,7 @@ def make_section(cond, h2_text, rader_var):
       table with {#rader_var} loop (label | verdi rows)
       {/cond}
     """
-    open_cond  = "{" + cond + "}"
+    open_cond  = "{#" + cond + "}"
     close_cond = "{/" + cond + "}"
     loop_open  = "{#" + rader_var + "}"
     loop_close = "{/" + rader_var + "}"
