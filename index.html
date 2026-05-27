@@ -2507,7 +2507,7 @@ function lukkEksport() {
 }
 
 function lasteEksportLibs(cb) {
-  if (window.PizZip && window.Docxtemplater) { cb(); return; }
+  if (window.PizZip && window.docxtemplater) { cb(); return; }
   const s1 = document.createElement('script');
   s1.src = 'https://cdn.jsdelivr.net/npm/pizzip@3/dist/pizzip.min.js';
   s1.onload = () => {
@@ -2551,7 +2551,7 @@ async function kjorEksport() {
     if (!resp.ok) throw new Error(`Klarte ikke laste template.docx (HTTP ${resp.status})`);
     const buf = await resp.arrayBuffer();
     const zip = new PizZip(buf);
-    const doc = new Docxtemplater(zip, { paragraphLoop: true, linebreaks: true });
+    const doc = new docxtemplater(zip, { paragraphLoop: true, linebreaks: true });
     doc.render(data);
     const blob = doc.getZip().generate({
       type: 'blob',
