@@ -1,0 +1,2183 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEK 400 Kabelkalkulator</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f3f1ec;
+    --surface: #ffffff;
+    --surface2: #eeecea;
+    --surface3: #e6e4de;
+    --border: rgba(0,0,0,0.08);
+    --border-mid: rgba(0,0,0,0.15);
+    --border-strong: rgba(0,0,0,0.26);
+    --text: #111110;
+    --text-2: #4e4e4a;
+    --text-3: #8c8c86;
+    --accent: #1a3a2a;
+    --accent-mid: #255038;
+    --accent-light: #e3ede7;
+    --accent-glow: rgba(26,58,42,0.14);
+    --accent-text: #1a3a2a;
+    --ok-bg: #e6f3d8;
+    --ok-text: #275210;
+    --ok-border: #82bc48;
+    --fail-bg: #fce8e8;
+    --fail-text: #a01c1c;
+    --fail-border: #dc5858;
+    --warn-bg: #fdf2de;
+    --warn-text: #7a4c0e;
+    --info-bg: #e4eef8;
+    --info-text: #1a3e60;
+    --info-border: #6e9fd4;
+    --code-bg: #0d1117;
+    --code-text: #4ec994;
+    --code-border: #2d4a36;
+    --radius: 12px;
+    --radius-sm: 8px;
+    --radius-lg: 16px;
+    --shadow: 0 1px 2px rgba(0,0,0,0.05), 0 3px 10px rgba(0,0,0,0.07), 0 0 0 1px rgba(0,0,0,0.07);
+    --shadow-md: 0 4px 20px rgba(0,0,0,0.12), 0 1px 4px rgba(0,0,0,0.06), 0 0 0 1px rgba(0,0,0,0.08);
+    --shadow-lg: 0 12px 48px rgba(0,0,0,0.18), 0 4px 12px rgba(0,0,0,0.08), 0 0 0 1px rgba(0,0,0,0.09);
+    --header-h: 88px;
+    --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+    --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 14px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  header {
+    background: linear-gradient(135deg, #1f4533 0%, #1a3a2a 55%, #14281e 100%);
+    color: #fff;
+    padding: 1.25rem 2rem 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 1px 0 rgba(255,255,255,0.05), 0 2px 20px rgba(0,0,0,0.25);
+  }
+
+  .header-top {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding-bottom: 1rem;
+  }
+
+  nav {
+    display: flex;
+    gap: 2px;
+    margin-top: 4px;
+  }
+
+  nav button {
+    background: transparent;
+    border: none;
+    color: rgba(255,255,255,0.58);
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 9px 18px;
+    border-radius: 8px 8px 0 0;
+    cursor: pointer;
+    transition: background 150ms var(--ease-out), color 150ms var(--ease-out), transform 100ms var(--ease-out);
+    letter-spacing: 0.01em;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    nav button:hover { background: rgba(255,255,255,0.09); color: rgba(255,255,255,0.9); }
+  }
+  nav button:active { transform: scale(0.97); }
+  nav button.active { background: var(--bg); color: var(--accent); font-weight: 600; box-shadow: inset 0 0 0 1px rgba(0,0,0,0.06); }
+
+  header .logo {
+    width: 38px; height: 38px;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.10);
+    border-radius: var(--radius-sm);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+  }
+
+  header h1 { font-size: 17px; font-weight: 600; letter-spacing: -0.01em; }
+  header p { font-size: 12px; opacity: 0.65; margin-top: 1px; }
+
+  .container {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+    display: grid;
+    gap: 16px;
+  }
+
+  .card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 1.5rem;
+    border: 1px solid rgba(0,0,0,0.06);
+  }
+
+  .card-title {
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-3);
+    margin-bottom: 14px;
+    padding-bottom: 10px;
+    border-bottom: 0.5px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .card-title .dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--accent);
+    flex-shrink: 0;
+    box-shadow: 0 0 0 2px var(--accent-light);
+  }
+
+  .grid2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+
+  @media (max-width: 560px) {
+    .grid2, .grid3 { grid-template-columns: 1fr; }
+    .container { padding: 1rem; }
+    header { padding: 1rem 1.25rem; }
+  }
+
+  .field { display: flex; flex-direction: column; gap: 5px; }
+
+  .field label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-2);
+  }
+
+  .field select,
+  .field input[type="number"] {
+    appearance: none;
+    -webkit-appearance: none;
+    background: var(--surface2);
+    border: 0.5px solid var(--border-mid);
+    border-radius: var(--radius-sm);
+    padding: 8px 10px;
+    font-size: 13px;
+    color: var(--text);
+    font-family: inherit;
+    width: 100%;
+    transition: border-color 150ms var(--ease-out), box-shadow 150ms var(--ease-out);
+    outline: none;
+  }
+
+  .field select { cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%23888884' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; padding-right: 28px; }
+
+  .field select:focus,
+  .field input:focus {
+    border-color: var(--accent);
+    background: var(--surface);
+    box-shadow: 0 0 0 3px var(--accent-glow), 0 0 0 1px var(--accent);
+  }
+
+  .summary-bar {
+    border-radius: var(--radius);
+    padding: 14px 18px;
+    font-size: 14px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: background 200ms var(--ease-out), color 200ms var(--ease-out), border-color 200ms var(--ease-out);
+  }
+
+  .summary-bar.ok  { background: var(--ok-bg);   color: var(--ok-text);   border: 1px solid var(--ok-border); }
+  .summary-bar.fail{ background: var(--fail-bg);  color: var(--fail-text); border: 1px solid var(--fail-border); }
+  .summary-bar.neutral { background: var(--info-bg); color: var(--info-text); border: 1px solid #b0cce0; }
+
+  .summary-bar .icon { font-size: 18px; flex-shrink: 0; }
+
+  .formula-box {
+    background: var(--code-bg);
+    border: 1px solid #1e3028;
+    border-left: 3px solid var(--code-border);
+    border-radius: var(--radius-sm);
+    padding: 12px 16px;
+    margin-bottom: 14px;
+    font-family: 'Courier New', 'Consolas', 'SF Mono', 'Monaco', monospace;
+    font-size: 12.5px;
+    color: var(--code-text);
+    line-height: 1.85;
+    white-space: pre-wrap;
+    word-break: break-word;
+    letter-spacing: 0.01em;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.03), 0 2px 8px rgba(0,0,0,0.15);
+  }
+
+  .krav-table { width: 100%; border-collapse: collapse; }
+  .krav-table tr { border-bottom: 0.5px solid var(--border); }
+  .krav-table tr:last-child { border-bottom: none; }
+  .krav-table td { padding: 8px 0; vertical-align: middle; }
+  .krav-table td:first-child { color: var(--text-2); font-size: 13px; width: 65%; }
+  .krav-table td:last-child { font-weight: 500; font-size: 13px; text-align: right; }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 5px 13px;
+    border-radius: 100px;
+    margin-top: 12px;
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    transition: opacity 250ms var(--ease-out), transform 250ms var(--ease-out);
+    @starting-style {
+      opacity: 0;
+      transform: translateY(4px) scale(0.92);
+    }
+  }
+
+  .badge.ok   { background: var(--ok-bg);   color: var(--ok-text);   border: 1px solid var(--ok-border); }
+  .badge.fail { background: var(--fail-bg);  color: var(--fail-text); border: 1px solid var(--fail-border); }
+
+  .result-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+  }
+
+  @media (max-width: 640px) { .result-grid { grid-template-columns: repeat(2, 1fr); } }
+
+  .metric {
+    background: var(--surface);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px 12px;
+    border: 1px solid var(--border-mid);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .metric::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent) 0%, var(--accent-mid) 100%);
+  }
+
+  .metric-label { font-size: 10px; color: var(--text-3); margin-bottom: 6px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; }
+  .metric-value { font-size: 23px; font-weight: 800; color: var(--accent); letter-spacing: -0.03em; line-height: 1.1; }
+  .metric-sub   { font-size: 10.5px; color: var(--text-3); margin-top: 4px; line-height: 1.4; }
+
+  .ref-note {
+    font-size: 11px;
+    color: var(--text-3);
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 0.5px solid var(--border);
+  }
+
+  .page-layout {
+    display: flex;
+    align-items: flex-start;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+    gap: 16px;
+  }
+
+  .sidebar {
+    width: 190px;
+    flex-shrink: 0;
+    position: sticky;
+    top: calc(var(--header-h) + 1rem);
+  }
+
+  .sidebar-title {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--text-3);
+    margin-bottom: 8px;
+  }
+
+  .kurs-list { display: flex; flex-direction: column; gap: 4px; }
+
+  .kurs-btn {
+    background: var(--surface);
+    border: 0.5px solid var(--border-mid);
+    border-radius: var(--radius-sm);
+    padding: 8px 12px;
+    font-size: 13px;
+    font-family: inherit;
+    color: var(--text);
+    cursor: pointer;
+    text-align: left;
+    transition: background 120ms var(--ease-out), border-color 120ms var(--ease-out), color 120ms var(--ease-out), transform 100ms var(--ease-out);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .kurs-btn:hover { background: var(--surface2); }
+  }
+  .kurs-btn:active { transform: scale(0.97); }
+  .kurs-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .kurs-btn .kurs-status { font-size: 11px; opacity: 0.7; }
+
+  .kurs-add-btn {
+    margin-top: 8px;
+    width: 100%;
+    background: transparent;
+    border: 0.5px dashed var(--border-mid);
+    border-radius: var(--radius-sm);
+    padding: 8px;
+    font-size: 18px;
+    color: var(--text-3);
+    cursor: pointer;
+    transition: background 120ms var(--ease-out), color 120ms var(--ease-out), transform 100ms var(--ease-out);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .kurs-add-btn:hover { background: var(--surface2); color: var(--text); }
+  }
+  .kurs-add-btn:active { transform: scale(0.97); }
+
+  .kurs-del-btn {
+    background: transparent;
+    border: 0.5px solid var(--border-mid);
+    border-radius: var(--radius-sm);
+    padding: 4px 7px;
+    font-size: 12px;
+    color: var(--text-3);
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background 120ms var(--ease-out), color 120ms var(--ease-out), transform 100ms var(--ease-out);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .kurs-del-btn:hover { background: var(--fail-bg); color: var(--fail-text); border-color: var(--fail-border); }
+  }
+  .kurs-del-btn:active { transform: scale(0.97); }
+
+  .main-content { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 16px; }
+
+  .container { max-width: 100%; margin: 0; padding: 0; gap: 0; display: contents; }
+
+  @media (max-width: 640px) {
+    .page-layout { flex-direction: column; padding: 1rem; }
+    .sidebar { width: 100%; position: static; }
+    .kurs-list { flex-direction: row; flex-wrap: wrap; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      transition-duration: 0.01ms !important;
+      animation-duration: 0.01ms !important;
+    }
+  }
+
+  footer {
+    font-size: 11px;
+    color: var(--text-3);
+    text-align: center;
+    padding: 1.25rem 1.5rem 2rem;
+    border-top: 1px solid var(--border);
+    line-height: 1.7;
+  }
+
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-top">
+    <div class="logo">⚡</div>
+    <div>
+      <h1>NEK 400 Kabelkalkulator</h1>
+      <p>Krav 1 · Krav 2 · Spenningsfall · Motor — NEK 400:2022</p>
+    </div>
+  </div>
+  <nav>
+    <button class="active" onclick="visside('bolig', this)">Bolig</button>
+    <button onclick="visside('naring', this)">Næringsdrivende</button>
+    <button onclick="visside('motor', this)">Motor</button>
+    <button onclick="visside('ov', this)">Overbelastning</button>
+    <button onclick="visside('jording', this)">Jording</button>
+  </nav>
+</header>
+
+<div id="side-bolig">
+<div class="page-layout">
+
+  <div class="sidebar">
+    <div class="sidebar-title">Kurser</div>
+    <div class="kurs-list" id="b-kurs-list"></div>
+    <button class="kurs-add-btn" onclick="leggTilKurs('b')" title="Legg til kurs">+</button>
+  </div>
+
+  <div class="main-content">
+
+  <div class="card">
+    <div class="card-title"><span class="dot"></span>Inndata</div>
+    <div class="grid2" style="margin-bottom:12px;">
+      <div class="field">
+        <label>Forleggingsmetode</label>
+        <select id="metode">
+          <option value="A1">A1 — i isolert vegg</option>
+          <option value="A2">A2 — i isolert vegg, flerkjernet</option>
+          <option value="B1" selected>B1 — i rør på vegg</option>
+          <option value="B2">B2 — i rør på vegg, flerkjernet</option>
+          <option value="C">C — direkte på vegg</option>
+          <option value="D2">D2 — i bakke</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Antall belastede ledere / spenning</label>
+        <select id="ledere">
+          <option value="2_230" selected>2 ledere — 230 V</option>
+          <option value="3_230">3 ledere — 230 V</option>
+          <option value="2_400">2 ledere — 400 V</option>
+          <option value="3_400">3 ledere — 400 V</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Netttype</label>
+        <select id="netttype">
+          <option value="TN" selected>TN-nett (400 V)</option>
+          <option value="IT">IT-nett (230 V)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Omgivelsestemperatur (°C)</label>
+        <select id="temp">
+          <option value="10">10 °C  (kf = 1,22)</option>
+          <option value="15">15 °C  (kf = 1,17)</option>
+          <option value="20">20 °C  (kf = 1,12)</option>
+          <option value="25">25 °C  (kf = 1,06)</option>
+          <option value="30" selected>30 °C  (kf = 1,00 — referanse)</option>
+          <option value="35">35 °C  (kf = 0,94)</option>
+          <option value="40">40 °C  (kf = 0,87)</option>
+          <option value="45">45 °C  (kf = 0,79)</option>
+          <option value="50">50 °C  (kf = 0,71)</option>
+          <option value="55">55 °C  (kf = 0,61)</option>
+          <option value="60">60 °C  (kf = 0,50)</option>
+        </select>
+      </div>
+    </div>
+    <div class="grid3">
+      <div class="field">
+        <label>Belastningsstrøm I<sub>B</sub> (A)</label>
+        <input type="number" id="ib" value="16" min="0.1" max="500" step="0.1">
+      </div>
+      <div class="field">
+        <label>Verntype</label>
+        <select id="verntype">
+          <option value="A">A-automat (I₂ = 1,45 × In)</option>
+          <option value="B">B-automat (I₂ = 1,45 × In)</option>
+          <option value="BK">BK-automat (I₂ = 1,20 × In)</option>
+          <option value="C" selected>C-automat (I₂ = 1,45 × In)</option>
+          <option value="CK">CK-automat (I₂ = 1,20 × In)</option>
+          <option value="D">D-automat (I₂ = 1,45 × In)</option>
+          <option value="K">K-automat (I₂ = 1,20 × In)</option>
+          <option value="Z">Z-automat (I₂ = 1,20 × In)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Spenningsfallgrense ΔU<sub>maks</sub> (%)</label>
+        <select id="grense">
+          <option value="3">3 %</option>
+          <option value="5" selected>5 %</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Kurslengde L (m)</label>
+        <input type="number" id="lengde" value="25" min="1" max="5000" step="1">
+      </div>
+      <div class="field">
+        <label>Minste kortslutningsstrøm i fordeling (kA)</label>
+        <select id="ik_fordeling">
+          <option value="0.5">0,5 kA</option>
+          <option value="1" selected>1 kA</option>
+          <option value="2">2 kA</option>
+          <option value="3">3 kA</option>
+          <option value="4">4 kA</option>
+          <option value="5">5 kA</option>
+          <option value="10">10 kA</option>
+          <option value="15">15 kA</option>
+          <option value="30">30 kA</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Maks kortslutningsstrøm Ik3pmax (kA)</label>
+        <select id="ik3pmax">
+          <option value="1">1 kA</option>
+          <option value="3">3 kA</option>
+          <option value="6" selected>6 kA</option>
+          <option value="10">10 kA</option>
+          <option value="16">16 kA</option>
+          <option value="25">25 kA</option>
+          <option value="50">50 kA</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div id="summary-bar" class="summary-bar neutral">
+    <span class="icon">⚡</span>
+    <span id="summary-text">Kalkulator klar — fyll inn verdier ovenfor</span>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot"></span>Krav 1 — I<sub>B</sub> ≤ I<sub>n</sub> &nbsp;(NEK 400-8-823.433.1)</div>
+    <div class="formula-box" id="f-krav1">—</div>
+    <table class="krav-table" id="rows-krav1"></table>
+    <div id="badge-krav1"></div>
+    <p class="ref-note">Ref: NEK 400-8-823.433.1 · Elbok §5.4.4 · NEK EN 60898 standardsikringer</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot"></span>Krav 2 — I₂ ≤ I<sub>z</sub> &nbsp;(NEK 400-8-823.433.1, bolig)</div>
+    <div class="formula-box" id="f-krav2">—</div>
+    <table class="krav-table" id="rows-krav2"></table>
+    <div id="badge-krav2"></div>
+    <p class="ref-note">Ref: NEK 400-8-823.431.3.1 · Tabell 52B-2 (Cu/PVC)</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot"></span>Spenningsfall &nbsp;(NEK 400 §525 / Tabell 52F-1)</div>
+    <div class="formula-box" id="f-sf">—</div>
+    <table class="krav-table" id="rows-sf"></table>
+    <div id="badge-sf"></div>
+    <p class="ref-note">Ref: NEK 400 §525 · Elbok §6.2.7 · ρ = 0,018 Ω</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot"></span>Ik2pmin — minste topolt kortslutningsstrøm &nbsp;(NEK 400 §533.3)</div>
+    <div class="formula-box" id="f-ik">—</div>
+    <table class="krav-table" id="rows-ik"></table>
+    <div id="badge-ik"></div>
+    <p class="ref-note">Ref: Elbok §5.6.3 · Tabell 5.6b (Zytre) · Tabell 5.6c (rfase)</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot"></span>Anbefalt kabel — oppsummering</div>
+    <div class="result-grid" id="result-cards"></div>
+    <p class="ref-note" id="result-note" style="margin-top:14px;"></p>
+  </div>
+
+  </div><!-- end main-content -->
+</div><!-- end page-layout -->
+
+<footer>
+  NEK 400:2022 · Montørhåndboka · Elbok · Cu/PVC — beregning for boliginstallasjon<br>
+  Alle verdier basert på Tabell 52B (Iz), Tabell 52F (ρ), NEK EN 60898 (In-serien)
+</footer>
+</div>
+
+<div id="side-naring" style="display:none;">
+<div class="page-layout">
+
+  <div class="sidebar">
+    <div class="sidebar-title">Kurser</div>
+    <div class="kurs-list" id="n-kurs-list"></div>
+    <button class="kurs-add-btn" onclick="leggTilKurs('n')" title="Legg til kurs">+</button>
+  </div>
+
+  <div class="main-content">
+
+  <div class="card">
+    <div class="card-title"><span class="dot"></span>Inndata</div>
+    <div class="grid2" style="margin-bottom:12px;">
+      <div class="field">
+        <label>Forleggingsmetode</label>
+        <select id="n-metode">
+          <option value="A1">A1 — i isolert vegg</option>
+          <option value="A2">A2 — i isolert vegg, flerkjernet</option>
+          <option value="B1" selected>B1 — i rør på vegg</option>
+          <option value="B2">B2 — i rør på vegg, flerkjernet</option>
+          <option value="C">C — direkte på vegg</option>
+          <option value="D2">D2 — i bakke</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Antall belastede ledere / spenning</label>
+        <select id="n-ledere">
+          <option value="2_230" selected>2 ledere — 230 V</option>
+          <option value="3_230">3 ledere — 230 V</option>
+          <option value="2_400">2 ledere — 400 V</option>
+          <option value="3_400">3 ledere — 400 V</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Netttype</label>
+        <select id="n-netttype">
+          <option value="TN" selected>TN-nett (400 V)</option>
+          <option value="IT">IT-nett (230 V)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Omgivelsestemperatur (°C)</label>
+        <select id="n-temp">
+          <option value="10">10 °C  (kf = 1,22)</option>
+          <option value="15">15 °C  (kf = 1,17)</option>
+          <option value="20">20 °C  (kf = 1,12)</option>
+          <option value="25">25 °C  (kf = 1,06)</option>
+          <option value="30" selected>30 °C  (kf = 1,00 — referanse)</option>
+          <option value="35">35 °C  (kf = 0,94)</option>
+          <option value="40">40 °C  (kf = 0,87)</option>
+          <option value="45">45 °C  (kf = 0,79)</option>
+          <option value="50">50 °C  (kf = 0,71)</option>
+          <option value="55">55 °C  (kf = 0,61)</option>
+          <option value="60">60 °C  (kf = 0,50)</option>
+        </select>
+      </div>
+    </div>
+    <div class="grid3">
+      <div class="field">
+        <label>Belastningsstrøm I<sub>B</sub> (A)</label>
+        <input type="number" id="n-ib" value="16" min="0.1" max="500" step="0.1">
+      </div>
+      <div class="field">
+        <label>Verntype</label>
+        <select id="n-verntype">
+          <option value="A">A-automat (I₂ = 1,45 × In)</option>
+          <option value="B">B-automat (I₂ = 1,45 × In)</option>
+          <option value="BK">BK-automat (I₂ = 1,20 × In)</option>
+          <option value="C" selected>C-automat (I₂ = 1,45 × In)</option>
+          <option value="CK">CK-automat (I₂ = 1,20 × In)</option>
+          <option value="D">D-automat (I₂ = 1,45 × In)</option>
+          <option value="K">K-automat (I₂ = 1,20 × In)</option>
+          <option value="Z">Z-automat (I₂ = 1,20 × In)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Spenningsfallgrense ΔU<sub>maks</sub> (%)</label>
+        <select id="n-grense">
+          <option value="3">3 %</option>
+          <option value="5" selected>5 %</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Kurslengde L (m)</label>
+        <input type="number" id="n-lengde" value="25" min="1" max="5000" step="1">
+      </div>
+      <div class="field">
+        <label>Minste kortslutningsstrøm i fordeling (kA)</label>
+        <select id="n-ik_fordeling">
+          <option value="0.5">0,5 kA</option>
+          <option value="1" selected>1 kA</option>
+          <option value="2">2 kA</option>
+          <option value="3">3 kA</option>
+          <option value="4">4 kA</option>
+          <option value="5">5 kA</option>
+          <option value="10">10 kA</option>
+          <option value="15">15 kA</option>
+          <option value="30">30 kA</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Maks kortslutningsstrøm Ik3pmax (kA)</label>
+        <select id="n-ik3pmax">
+          <option value="1">1 kA</option>
+          <option value="3">3 kA</option>
+          <option value="6" selected>6 kA</option>
+          <option value="10">10 kA</option>
+          <option value="16">16 kA</option>
+          <option value="25">25 kA</option>
+          <option value="50">50 kA</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div id="n-summary-bar" class="summary-bar neutral">
+    <span class="icon">⚡</span>
+    <span id="n-summary-text">Kalkulator klar — fyll inn verdier ovenfor</span>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot"></span>Krav 1 — I<sub>B</sub> ≤ I<sub>n</sub> &nbsp;(NEK 400-8-823.433.1)</div>
+    <div class="formula-box" id="n-f-krav1">—</div>
+    <table class="krav-table" id="n-rows-krav1"></table>
+    <div id="n-badge-krav1"></div>
+    <p class="ref-note">Ref: NEK 400-8-823.433.1 · Elbok §5.4.4 · NEK EN 60898 standardsikringer</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot"></span>Krav 2 — I₂ ≤ I<sub>z</sub> × 1,45 &nbsp;(NEK 400-8-823.433.1, næring)</div>
+    <div class="formula-box" id="n-f-krav2">—</div>
+    <table class="krav-table" id="n-rows-krav2"></table>
+    <div id="n-badge-krav2"></div>
+    <p class="ref-note">Ref: NEK 400-8-823.431.3.1 · Tabell 52B-2 (Cu/PVC)</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot"></span>Nasjonale tilpasninger — minstekrav tverrsnitt &nbsp;(NEK 400 §524.1 NA)</div>
+    <div class="formula-box" id="n-f-nasj">—</div>
+    <table class="krav-table" id="n-rows-nasj"></table>
+    <div id="n-badge-nasj"></div>
+    <p class="ref-note">Ref: NEK 400 §524.1 NA · Gjelder kun næringsdrivende, ≤ 4 mm²</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot"></span>Spenningsfall &nbsp;(NEK 400 §525 / Tabell 52F-1)</div>
+    <div class="formula-box" id="n-f-sf">—</div>
+    <table class="krav-table" id="n-rows-sf"></table>
+    <div id="n-badge-sf"></div>
+    <p class="ref-note">Ref: NEK 400 §525 · Elbok §6.2.7 · ρ = 0,018 Ω</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot"></span>Ik2pmin — minste topolt kortslutningsstrøm &nbsp;(NEK 400 §533.3)</div>
+    <div class="formula-box" id="n-f-ik">—</div>
+    <table class="krav-table" id="n-rows-ik"></table>
+    <div id="n-badge-ik"></div>
+    <p class="ref-note">Ref: Elbok §5.6.3 · Tabell 5.6b (Zytre) · Tabell 5.6c (rfase)</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot"></span>Anbefalt kabel — oppsummering</div>
+    <div class="result-grid" id="n-result-cards"></div>
+    <p class="ref-note" id="n-result-note" style="margin-top:14px;"></p>
+  </div>
+
+  </div><!-- end main-content -->
+</div><!-- end page-layout -->
+<footer>
+  NEK 400:2022 · Montørhåndboka · Elbok · Cu/PVC — beregning for næringsinstallasjon<br>
+  Alle verdier basert på Tabell 52B (Iz), Tabell 52F (ρ), NEK EN 60898 (In-serien)
+</footer>
+</div>
+
+<div id="side-motor" style="display:none;">
+<div class="page-layout">
+
+  <div class="sidebar">
+    <div class="sidebar-title">Motorkalkulator</div>
+    <div style="font-size:12px;color:var(--text-2);line-height:1.6;padding:4px 0;">
+      Beregner virkningsgrad, reaktiv effekt og kondensatorkompensering for elektromotor.
+    </div>
+    <div style="margin-top:12px;font-size:11px;color:var(--text-3);line-height:1.9;border-top:0.5px solid var(--border);padding-top:10px;">
+      η = P&#8209;avgitt / P&#8209;tilført<br>
+      Q<sub>L</sub> = P × tan φ<br>
+      I<sub>C</sub> = Q<sub>C</sub> / U<br>
+      X<sub>C</sub> = U / I<sub>C</sub><br>
+      C = 1 / (2πf · X<sub>C</sub>)<br><br>
+      I<sub>før</sub> = P<sub>fase</sub> / (U · cos φ)<br>
+      I<sub>etter</sub> = P<sub>fase</sub> / (U · 1)
+    </div>
+  </div>
+
+  <div class="main-content">
+
+  <div class="card">
+    <div class="card-title"><span class="dot"></span>Inndata — Motor</div>
+    <div class="grid3">
+      <div class="field">
+        <label>Effekt P<sub>avgitt</sub> (kW)</label>
+        <input type="number" id="m-p" value="5.5" min="0.01" max="5000" step="0.01" oninput="calcMotor()">
+      </div>
+      <div class="field">
+        <label>Spenning U (V)</label>
+        <input type="number" id="m-u" value="230" min="1" max="15000" step="1" oninput="calcMotor()">
+      </div>
+      <div class="field">
+        <label>Frekvens f (Hz)</label>
+        <input type="number" id="m-f" value="50" min="1" max="400" step="0.1" oninput="calcMotor()">
+      </div>
+      <div class="field">
+        <label>Effektfaktor cos φ</label>
+        <input type="number" id="m-cosphi" value="0.78" min="0.01" max="1" step="0.01" oninput="calcMotor()">
+      </div>
+      <div class="field">
+        <label>Antall faser</label>
+        <select id="m-faser" onchange="calcMotor()">
+          <option value="1">1-fase</option>
+          <option value="3" selected>3-fase</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Motorstrøm I (A) — for virkningsgrad</label>
+        <input type="number" id="m-i" value="" min="0.01" max="10000" step="0.1" placeholder="Valgfritt" oninput="calcMotor()">
+      </div>
+    </div>
+  </div>
+
+  <div class="card" id="m-card-virk" style="display:none;">
+    <div class="card-title"><span class="dot"></span>Virkningsgrad η</div>
+    <div class="formula-box" id="m-f-virk">—</div>
+    <table class="krav-table" id="m-rows-virk"></table>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot"></span>Effektfaktor</div>
+    <div class="formula-box" id="m-f-eff">—</div>
+    <table class="krav-table" id="m-rows-eff"></table>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot"></span>Reaktiv induktiv effekt og kapasistans for kompensering</div>
+    <div class="formula-box" id="m-f-kap">—</div>
+    <table class="krav-table" id="m-rows-kap"></table>
+  </div>
+
+  <div class="card">
+    <div class="card-title"><span class="dot"></span>Strømreduksjon etter kompensering</div>
+    <div class="formula-box" id="m-f-strom">—</div>
+    <table class="krav-table" id="m-rows-strom"></table>
+  </div>
+
+  </div>
+</div>
+</div>
+
+<div id="side-ov" style="display:none;">
+<div class="page-layout">
+  <div class="sidebar">
+    <div class="sidebar-title">Installasjon</div>
+    <div style="display:flex;flex-direction:column;gap:4px;">
+      <button class="kurs-btn active" id="ov-btn-bolig" onclick="visOvSide('bolig')">Bolig</button>
+      <button class="kurs-btn" id="ov-btn-naring" onclick="visOvSide('naring')">Næringsdrivende</button>
+    </div>
+  </div>
+  <div class="main-content">
+    <div id="ov-bolig-content">
+      <div class="card">
+        <div class="card-title"><span class="dot"></span>Overbelastningsvern — Bolig</div>
+        <p style="font-size:13px;color:var(--text-2);margin-bottom:12px;">Basert på kursene fra Bolig-siden. Legg til/endre kurser der.</p>
+        <div class="formula-box">OV = (Ptot × Sf) / (√3 × U)<br>Ptot beregnes fra Ib på hver kurs. Sf = Tabell 5.4c (NEK 439).</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0 0;max-width:460px;">
+          <div class="field">
+            <label>Forleggingsmetode inntakskabel</label>
+            <select id="ov-b-metode" onchange="calcOV()">
+              <option value="A1">A1 — i isolert vegg</option>
+              <option value="A2">A2 — i isolert vegg, flerkjernet</option>
+              <option value="B1">B1 — i rør på vegg</option>
+              <option value="B2">B2 — i rør på vegg, flerkjernet</option>
+              <option value="C" selected>C — direkte på vegg</option>
+              <option value="D2">D2 — i bakke</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Netttype</label>
+            <select id="ov-b-netttype" onchange="calcOV()">
+              <option value="TN" selected>TN-nett (400 V)</option>
+              <option value="IT">IT-nett (230 V)</option>
+            </select>
+          </div>
+        </div>
+        <div class="field" style="max-width:220px;margin:8px 0 0;">
+          <label>Sikkerhetsmargin (%)</label>
+          <input type="number" id="ov-b-margin" value="20" min="0" max="100" step="1" oninput="calcOV()">
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:8px 0 0;max-width:460px;">
+          <div class="field">
+            <label>I₂-faktor OV-vern</label>
+            <input type="number" id="ov-b-i2" value="1.45" min="1" max="3" step="0.01" oninput="calcOV()">
+          </div>
+          <div class="field">
+            <label>I₅ OV-vern (A)</label>
+            <input type="number" id="ov-b-i5" value="800" min="1" max="10000" step="1" oninput="calcOV()">
+          </div>
+        </div>
+        <div id="ov-b-tabell" style="margin:12px 0;"></div>
+        <table class="krav-table" id="ov-b-rows"></table>
+        <div id="ov-b-result" style="margin-top:12px;"></div>
+      </div>
+    </div>
+    <div id="ov-naring-content" style="display:none;">
+      <div class="card">
+        <div class="card-title"><span class="dot"></span>Overbelastningsvern — Næringsdrivende</div>
+        <p style="font-size:13px;color:var(--text-2);margin-bottom:12px;">Basert på kursene fra Næringsdrivende-siden. Legg til/endre kurser der.</p>
+        <div class="formula-box">OV = (Ptot × Sf) / (√3 × U)<br>Ptot beregnes fra Ib på hver kurs. Sf = Tabell 5.4c (NEK 439, ikke-bolig).</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0 0;max-width:460px;">
+          <div class="field">
+            <label>Forleggingsmetode inntakskabel</label>
+            <select id="ov-n-metode" onchange="calcOV()">
+              <option value="A1">A1 — i isolert vegg</option>
+              <option value="A2">A2 — i isolert vegg, flerkjernet</option>
+              <option value="B1">B1 — i rør på vegg</option>
+              <option value="B2">B2 — i rør på vegg, flerkjernet</option>
+              <option value="C" selected>C — direkte på vegg</option>
+              <option value="D2">D2 — i bakke</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Netttype</label>
+            <select id="ov-n-netttype" onchange="calcOV()">
+              <option value="TN" selected>TN-nett (400 V)</option>
+              <option value="IT">IT-nett (230 V)</option>
+            </select>
+          </div>
+        </div>
+        <div class="field" style="max-width:220px;margin:8px 0 0;">
+          <label>Sikkerhetsmargin (%)</label>
+          <input type="number" id="ov-n-margin" value="20" min="0" max="100" step="1" oninput="calcOV()">
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:8px 0 0;max-width:460px;">
+          <div class="field">
+            <label>I₂-faktor OV-vern</label>
+            <input type="number" id="ov-n-i2" value="1.45" min="1" max="3" step="0.01" oninput="calcOV()">
+          </div>
+          <div class="field">
+            <label>I₅ OV-vern (A)</label>
+            <input type="number" id="ov-n-i5" value="800" min="1" max="10000" step="1" oninput="calcOV()">
+          </div>
+        </div>
+        <div id="ov-n-tabell" style="margin:12px 0;"></div>
+        <table class="krav-table" id="ov-n-rows"></table>
+        <div id="ov-n-result" style="margin-top:12px;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+<footer>
+  NEK 400:2022 · Montørhåndboka · Elbok — Overbelastningsvern<br>
+  Tabell 5.4c (NEK 439) · OV = (Ptot × Sf) / (√3 × U)
+</footer>
+</div>
+
+<div id="side-jording" style="display:none;">
+<div class="page-layout">
+  <div class="sidebar">
+    <div class="sidebar-title">Jordingskalkulator</div>
+    <div style="font-size:12px;color:var(--text-2);line-height:1.6;padding:4px 0;">
+      Beregner maksimal jordelektrodemotstand Ra og anbefalt elektrodedimensjon for IT-nett iht. FEF / NEK 400-5-54.
+    </div>
+    <div style="margin-top:12px;font-size:11px;color:var(--text-3);line-height:1.8;border-top:0.5px solid var(--border);padding-top:10px;">
+      Ra × Id ≤ Uc<br>
+      Uc = 50 V (normal)<br>
+      Uc = 5 V (tørke/frost)<br>
+      <br>
+      Jordband: 20×3 mm<br>
+      Dybde: 0,5 m<br>
+      Stav: ⌀20 mm
+    </div>
+  </div>
+
+  <div class="main-content">
+
+    <div class="card">
+      <div class="card-title"><span class="dot"></span>Inndata</div>
+      <div class="grid2" style="margin-bottom:12px;">
+        <div class="field">
+          <label>Netttype</label>
+          <select id="j-netttype" onchange="calcJording()">
+            <option value="IT">IT-nett (230 V)</option>
+            <option value="TN">TN-nett (400 V)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Trafostørrelse (kVA)</label>
+          <input type="number" id="j-trafo" min="1" max="10000" step="1" value="200" oninput="calcJording()">
+        </div>
+        <div class="field">
+          <label>Inntakskabeltype</label>
+          <select id="j-kabeltype" onchange="calcJording()">
+            <option value="1">Type 1</option>
+            <option value="2">Type 2</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="j-forhands-section" style="padding:12px;background:var(--surface2);border-radius:var(--radius-sm);border-left:3px solid var(--accent);margin-bottom:12px;">
+        <div class="field" style="margin-bottom:10px;">
+          <label>Forhånds koblet jordfeilbryter?</label>
+          <div style="display:flex;gap:16px;margin-top:6px;">
+            <label style="display:flex;align-items:center;gap:6px;font-weight:400;font-size:13px;cursor:pointer;">
+              <input type="radio" name="j-forhands" value="nei" checked onchange="calcJording()"> Nei
+            </label>
+            <label style="display:flex;align-items:center;gap:6px;font-weight:400;font-size:13px;cursor:pointer;">
+              <input type="radio" name="j-forhands" value="ja" onchange="calcJording()"> Ja
+            </label>
+          </div>
+        </div>
+        <div id="j-forhands-storrelse-section" style="display:none;">
+          <div class="field" style="max-width:260px;">
+            <label>Forhånds koblet JFB-størrelse (mA)</label>
+            <input type="number" id="j-forhands-storrelse" min="1" max="10000" step="1" placeholder="f.eks. 300" oninput="calcJording()">
+          </div>
+        </div>
+      </div>
+
+      <div id="j-jfb-section" style="display:none;margin-bottom:12px;">
+        <div class="field" style="max-width:260px;">
+          <label>Jordfeilbryter størrelse (mA)</label>
+          <input type="number" id="j-jfb" min="1" max="10000" step="1" value="300" oninput="calcJording()">
+        </div>
+      </div>
+
+      <div class="grid3" style="margin-top:12px;">
+        <div class="field">
+          <label>Jordsmonn</label>
+          <select id="j-jordtype" onchange="calcJording()">
+            <option value="">— Velg jordsmonn —</option>
+            <option value="myrjord">Myrjord (ρ = 30 Ω·m)</option>
+            <option value="matjord">Matjord/leire (ρ = 100 Ω·m)</option>
+            <option value="sandjord">Sandjord (ρ = 200 Ω·m)</option>
+            <option value="fuktigsand">Fuktig sand (ρ = 300 Ω·m)</option>
+            <option value="fuktiggrus">Fuktig grus (ρ = 500 Ω·m)</option>
+            <option value="torrsand">Tørr sand (ρ = 1 000 Ω·m)</option>
+            <option value="steingrunn">Steingrunn (ρ = 3 000 Ω·m)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Husets omkrets (m) — for ringjord</label>
+          <input type="number" id="j-omkrets" min="1" max="2000" step="0.5" placeholder="f.eks. 40" oninput="calcJording()">
+        </div>
+        <div class="field">
+          <label>Korreksjonsfaktor (tørke/frost)</label>
+          <select id="j-faktor" onchange="calcJording()">
+            <option value="1">1× — ingen korreksjon</option>
+            <option value="3">3× — lett tørke/frost</option>
+            <option value="5">5× — moderat</option>
+            <option value="10" selected>10× — streng frost/tørke</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div id="j-summary-bar" class="summary-bar neutral">
+      <span class="icon">⚡</span>
+      <span id="j-summary-text">Fyll inn verdier ovenfor</span>
+    </div>
+
+    <div id="j-tn-card" class="card" style="display:none;">
+      <div class="card-title"><span class="dot"></span>TN-nett — jordfeilberegning ikke nødvendig</div>
+      <div class="formula-box">TN-nett bruker automatisk frakobling via overstrømsvern (NEK 400-4-41).
+Krav Ra × Id ≤ Uc gjelder ikke for TN — overstrømsvernet sikrer frakobling ved jordfeil.</div>
+      <p class="ref-note">Ref: NEK 400-4-41 · Elbok §5.3 — TN-nett: overstrømsvern og frakobling</p>
+    </div>
+
+    <div id="j-it-results" style="display:none;">
+
+      <div class="card">
+        <div class="card-title"><span class="dot"></span>Beregnet jordfeilstrøm og Ra-krav</div>
+        <div class="formula-box" id="j-formel">—</div>
+        <table class="krav-table" id="j-rows-ra"></table>
+        <div class="result-grid" style="grid-template-columns:repeat(3,1fr);margin-top:14px;" id="j-ra-metrics"></div>
+        <p class="ref-note">Ref: FEF 2006 §8 / NEK 400-5-54 — Ra × Id ≤ Uc (50 V normal, 5 V tørke/frost)</p>
+      </div>
+
+      <div id="j-recommendation-card" class="card" style="display:none;">
+        <div class="card-title"><span class="dot"></span>Anbefalt jordelektrode</div>
+        <div id="j-recommendation-content"></div>
+        <p class="ref-note" id="j-recommendation-note"></p>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+<footer>
+  FEF 2006 · NEK 400-5-54 — Jordingskalkulator for IT-nett<br>
+  Ra × Id ≤ 50 V (normal) · Ra × Id ≤ 5 V (tørke/frost) · jordband 20×3 mm / stav ⌀20 mm
+</footer>
+</div>
+
+<script>
+// Tabell 5.6b — Zytre (mΩ/fase) per spenning og Ik i fordeling
+const ZYTRE = {
+  230: {0.5:173, 1:86, 2:43, 3:29, 4:22, 5:17, 10:9,  15:6,  30:3},
+  400: {0.5:300, 1:150,2:75, 3:50, 4:38, 5:30, 10:15, 15:10, 30:5},
+  500: {0.5:375, 1:188,2:94, 3:63, 4:47, 5:38, 10:19, 15:13, 30:6},
+  690: {0.5:518, 1:259,2:129,3:86, 4:65, 5:52, 10:26, 15:17, 30:9},
+};
+
+const IZ = {
+  A1: { 2:{1.5:14.5,2.5:19.5,4:26,6:34,10:46,16:61,25:80,35:99,50:119,70:151,95:182,120:210},
+         3:{1.5:13.5,2.5:18,4:24,6:31,10:42,16:56,25:73,35:89,50:108,70:136,95:164,120:188} },
+  A2: { 2:{1.5:14,2.5:18.5,4:25,6:32,10:43,16:57,25:75,35:92,50:110,70:139,95:167,120:192},
+         3:{1.5:13,2.5:17.5,4:23,6:29,10:39,16:52,25:68,35:83,50:99,70:125,95:150,120:172} },
+  B1: { 2:{1.5:17.5,2.5:24,4:32,6:41,10:57,16:76,25:101,35:125,50:151,70:192,95:232,120:269},
+         3:{1.5:15.5,2.5:21,4:28,6:36,10:50,16:68,25:89,35:110,50:134,70:171,95:207,120:239} },
+  B2: { 2:{1.5:16.5,2.5:23,4:30,6:38,10:52,16:69,25:90,35:111,50:133,70:168,95:201,120:232},
+         3:{1.5:15,2.5:20,4:27,6:34,10:46,16:62,25:80,35:99,50:118,70:149,95:179,120:206} },
+  C:  { 2:{1.5:19.5,2.5:27,4:36,6:46,10:63,16:85,25:112,35:138,50:168,70:213,95:258,120:299},
+         3:{1.5:17.5,2.5:24,4:32,6:41,10:57,16:76,25:96,35:119,50:144,70:184,95:223,120:259} },
+  E:  { 2:{1.5:22,2.5:30,4:40,6:51,10:70,16:94,25:119,35:148,50:180,70:232,95:281,120:324},
+         3:{1.5:19.5,2.5:26,4:35,6:44,10:61,16:82,25:110,35:137,50:167,70:214,95:261,120:303} },
+  F:  { 2:{1.5:22,2.5:30,4:40,6:51,10:70,16:94,25:119,35:148,50:180,70:232,95:281,120:324},
+         3:{1.5:19.5,2.5:26,4:35,6:44,10:61,16:82,25:110,35:137,50:167,70:214,95:261,120:303} },
+  D2: { 2:{1.5:25,2.5:33,4:43,6:54,10:73,16:95,25:120,35:145,50:172,70:214,95:255,120:292},
+         3:{1.5:22,2.5:29,4:38,6:47,10:63,16:83,25:105,35:128,50:153,70:190,95:228,120:261} }
+};
+
+const SIKRINGER = [6,10,13,16,20,25,32,40,50,63,80,100,125,160,200];
+const SIZES = [1.5,2.5,4,6,10,16,25,35,50,70,95,120];
+const RHO = {1.5:12.1,2.5:7.41,4:4.61,6:3.08,10:1.83,16:1.15,25:0.727,35:0.524,50:0.387,70:0.268,95:0.193,120:0.153};
+// Tabell 5.4B — Montørhåndboka NEK 400:2022
+const VERN_DATA = {
+  A:  { i1: 1.13, i2: 1.45, i4: 2,  i5: 3,  merke: '6–63 A',   std: 'NEK EN 60898' },
+  B:  { i1: 1.13, i2: 1.45, i4: 3,  i5: 5,  merke: '6–63 A',   std: 'NEK EN 60898' },
+  C:  { i1: 1.13, i2: 1.45, i4: 5,  i5: 10, merke: '0,5–63 A', std: 'NEK EN 60898' },
+  D:  { i1: 1.13, i2: 1.45, i4: 10, i5: 20, merke: '0,5–63 A', std: 'NEK EN 60898' },
+  K:  { i1: 1.05, i2: 1.20, i4: 8,  i5: 12, merke: '0,5–63 A', std: 'NEK EN 60947' },
+  Z:  { i1: 1.05, i2: 1.20, i4: 2,  i5: 3,  merke: '0,5–63 A', std: 'NEK EN 60947' },
+  CK: { i1: 1.05, i2: 1.20, i4: 5,  i5: 10, merke: '0,5–63 A', std: '—' },
+  BK: { i1: 1.05, i2: 1.20, i4: 3,  i5: 5,  merke: '0,5–63 A', std: '—' },
+};
+const I2F = Object.fromEntries(Object.entries(VERN_DATA).map(([k,v]) => [k, v.i2]));
+// Tabell 6.2d — korreksjonsfaktorer for Cu/PVC (grensetemp 70°C, referanse 30°C)
+const KF_PVC = {10:1.22,15:1.17,20:1.12,25:1.06,30:1.00,35:0.94,40:0.87,45:0.79,50:0.71,55:0.61,60:0.50};
+
+function nextSikring(ib){ return SIKRINGER.find(s => s >= ib) || 200; }
+
+// Nasjonale tilpasninger — minstekrav tverrsnitt for næringsdrivende (NEK 400 §524.1 NA)
+function csNasjTilpasning(metode, In) {
+  const isAgroup = ['A1','A2'].includes(metode);
+  if (isAgroup) {
+    if (In <= 10) return 1.5;
+    if (In <= 16) return 2.5;
+    return 4; // In ≤ 20 og In > 20: begge krever min 4 mm²
+  } else {
+    if (In <= 13) return 1.5;
+    if (In <= 16) return 2.5;
+    return 4; // In ≤ 25 og In > 25: begge krever min 4 mm²
+  }
+}
+
+function findMinCs(metode, ledere, minIz){
+  const tab = IZ[metode]?.[ledere] || {};
+  return SIZES.find(s => (tab[s]||0) >= minIz) || null;
+}
+
+function badge(ok, text){ return `<span class="badge ${ok?'ok':'fail'}">${ok?'✓':'✕'} ${text}</span>`; }
+
+function row(label, val){ return `<tr><td>${label}</td><td>${val}</td></tr>`; }
+
+function calc(){
+  const metode   = document.getElementById('metode').value;
+  const ledereVal= document.getElementById('ledere').value; // format "2_230" etc
+  const [lStr, uStr] = ledereVal.split('_');
+  const ledere   = parseInt(lStr);
+  const U_kurs   = parseInt(uStr);
+  const Ib       = parseFloat(document.getElementById('ib').value) || 0;
+  const verntype = document.getElementById('verntype').value;
+  const grense   = parseFloat(document.getElementById('grense').value) || 5;
+  const L        = parseFloat(document.getElementById('lengde').value) || 0;
+  const netttype = document.getElementById('netttype').value;
+  const temp     = parseInt(document.getElementById('temp').value) || 30;
+  const kf       = KF_PVC[temp] ?? 1.00;
+
+  const U_nom   = U_kurs;
+  const U_sf    = U_kurs;
+  const sqrt3   = Math.sqrt(3);
+  const sysLabel = `${ledere} ledere — ${U_kurs} V`;
+
+  // For Zytre bruker vi netttype: TN=400V, IT=230V
+  const ik_spenning = netttype === 'IT' ? 230 : 400;
+
+  // KRAV 1 og 2
+  const In  = nextSikring(Ib);
+  const i2f = I2F[verntype] || 1.45;
+  const I2  = i2f * In;
+  const vd  = VERN_DATA[verntype] || VERN_DATA.C;
+
+  // Krav 2: finn cs2 som startpunkt — alltid basert på strengeste krav først (I2 ≤ Iz_eff)
+  // Iz_eff = Iz_tab × kf, så vi trenger Iz_tab ≥ I2/kf
+  // storKabel avgjøres av csEnd etter alle krav er kombinert
+  const cs2 = findMinCs(metode, ledere, I2 / kf);  // Iz_tab × kf ≥ I₂
+
+  // SPENNINGSFALL — formel: ΔU = (Ib × ρ × L × 2) / A,  ρ = 0,018 Ω fast
+  // Start fra minste tverrsnitt bestemt av krav 2, ikke fra 1,5 mm²
+  const RHO_SF   = 0.018;
+  const cs2idx_sf = SIZES.indexOf(cs2 || 1.5);
+  let csSF = null, du_v_sf = 0, du_pct_sf = 0;
+  for(let i = cs2idx_sf; i < SIZES.length; i++){
+    const s      = SIZES[i];
+    const du_v   = (Ib * RHO_SF * L * 2) / s;
+    const du_pct = (du_v / U_sf) * 100;
+    if(du_pct <= grense){ csSF = s; du_v_sf = du_v; du_pct_sf = du_pct; break; }
+  }
+  if(!csSF){
+    csSF      = 120;
+    du_v_sf   = (Ib * RHO_SF * L * 2) / 120;
+    du_pct_sf = (du_v_sf / U_sf) * 100;
+  }
+  const sfOk = du_pct_sf <= grense;
+
+  document.getElementById('f-sf').textContent =
+    `ΔU = (Ib × ρ × L × 2) / A\n` +
+    `ΔU = (${Ib.toFixed(1)} × 0,018 × ${L} × 2) / ${csSF}\n` +
+    `ΔU = ${du_v_sf.toFixed(3)} V  →  ΔU% = (ΔU / ${U_sf}) × 100 = ${du_pct_sf.toFixed(2)} %`;
+
+  document.getElementById('rows-sf').innerHTML =
+    row('Belastningsstrøm Ib', `${Ib.toFixed(1)} A`) +
+    row('Resistivitet ρ (Cu, fast)', `0,018 Ω`) +
+    row('Kurslengde L', `${L} m`) +
+    row('Ledertverrsnitt A', `${csSF} mm²`) +
+    row('Spenningsfall ΔU = (Ib × ρ × L × 2) / A', `${du_v_sf.toFixed(3)} V`) +
+    row(`Referansespenning U`, `${U_sf} V`) +
+    row('Prosentvis ΔU% = (ΔU / U) × 100', `${du_pct_sf.toFixed(2)} % (grense: ${grense} %)`) +
+    row('Kontroll: ΔU% ≤ grense', `${du_pct_sf.toFixed(2)} ≤ ${grense} %`);
+
+  document.getElementById('badge-sf').innerHTML =
+    badge(sfOk, sfOk
+      ? `Oppfylt — ΔU = ${du_pct_sf.toFixed(2)} % ≤ ${grense} %`
+      : `Ikke oppfylt — ΔU = ${du_pct_sf.toFixed(2)} % > ${grense} % (øk tverrsnitt manuelt over 120 mm²)`);
+
+  // IK2PMIN — beregning (vises etter csEnd er kjent)
+  const ik_fordeling = parseFloat(document.getElementById('ik_fordeling').value);
+  const Zytre = ZYTRE[ik_spenning]?.[ik_fordeling] ?? 86;
+  const Un_ik = U_kurs;
+
+  const I5 = vd.i5;
+  const I5_grense = I5 * In;
+
+  let csIk = null, ik2pmin_val = 0;
+  for(const s of SIZES){
+    const rfase = RHO[s];
+    const denom = 2 * 1.2 * (Zytre + rfase * L);
+    const ik = (0.9 * Un_ik) / denom;
+    ik2pmin_val = ik;
+    if(ik * 1000 >= I5_grense){ csIk = s; break; }
+  }
+  if(!csIk){ csIk = 120; const rfase=RHO[120]; const denom=2*1.2*(Zytre+rfase*L); ik2pmin_val=(0.9*Un_ik)/denom; }
+  const ikOk = ik2pmin_val * 1000 >= I5_grense;
+
+  // ENDELIG TVERRSNITT — maks av alle krav
+  const idxFinal = Math.max(
+    SIZES.indexOf(findMinCs(metode, ledere, In / kf) || 1.5),
+    SIZES.indexOf(cs2 || 1.5),
+    SIZES.indexOf(csSF),
+    SIZES.indexOf(csIk || 1.5)
+  );
+  const csEnd      = SIZES[idxFinal];
+  const IzTab      = IZ[metode]?.[ledere]?.[csEnd] || 0;
+  const IzFinal    = IzTab * kf;
+  const du_v_end   = (Ib * RHO_SF * L * 2) / csEnd;
+  const du_pct_end = (du_v_end / U_sf) * 100;
+
+  // Resjekk krav 1 og 2 mot csEnd — spenningsfall/ik2pmin kan ha økt tverrsnittet
+  const storKabel   = csEnd > 4;
+  const krav1ok     = storKabel ? (Ib <= In && In <= IzFinal) : (Ib <= In);
+  const krav2ok     = storKabel ? (I2 <= IzFinal * 1.45) : (I2 <= IzFinal);
+  const krav2grense = storKabel ? `I₂ ≤ Iz × 1,45` : `I₂ ≤ Iz`;
+  const krav2verdi  = storKabel ? (IzFinal * 1.45).toFixed(2) : IzFinal.toFixed(1);
+
+  // KRAV 1 visning
+  document.getElementById('f-krav1').textContent = storKabel
+    ? `Krav 1 (> 4 mm²):  Ib ≤ In ≤ Iz\n${Ib.toFixed(1)} ≤ ${In} ≤ ${IzFinal.toFixed(1)} A`
+    : `Krav 1:  Ib ≤ In\n${Ib.toFixed(1)} A  ≤  ${In} A`;
+
+  document.getElementById('rows-krav1').innerHTML =
+    row('Belastningsstrøm I<sub>B</sub>', `${Ib.toFixed(1)} A`) +
+    row('Neste standard sikring I<sub>n</sub> (NEK EN 60898)', `${In} A`) +
+    (storKabel ? (kf !== 1.00 ? row(`Strømf. Iz_tab (${csEnd} mm², metode ${metode})`, `${IzTab.toFixed(1)} A`) + row(`Korreksjonsfaktor kf (${temp} °C, Tabell 6.2d)`, `${kf.toFixed(2)}`) : '') + row(`Strømf. Iz${kf !== 1.00 ? ' (korrigert)' : ''} (${csEnd} mm², metode ${metode})`, `${IzFinal.toFixed(1)} A`) : '') +
+    row(storKabel ? 'Kontroll: Ib ≤ In ≤ Iz' : 'Kontroll: Ib ≤ In',
+        storKabel ? `${Ib.toFixed(1)} ≤ ${In} ≤ ${IzFinal.toFixed(1)} A` : `${Ib.toFixed(1)} ≤ ${In} A`);
+
+  document.getElementById('badge-krav1').innerHTML =
+    badge(krav1ok, krav1ok
+      ? `Oppfylt — Ib ${Ib.toFixed(1)} A ≤ In ${In} A${storKabel ? ` ≤ Iz ${IzFinal.toFixed(1)} A` : ''}`
+      : `Ikke oppfylt`);
+
+  // KRAV 2 visning
+  document.getElementById('f-krav2').textContent = storKabel
+    ? `Krav 2 (> 4 mm²):  I₂ ≤ Iz × 1,45\n${I2.toFixed(2)} A  ≤  ${krav2verdi} A`
+    : `Krav 2:  I₂ ≤ Iz\n${I2.toFixed(2)} A  ≤  ${IzFinal.toFixed(1)} A`;
+
+  document.getElementById('rows-krav2').innerHTML =
+    row('Verntype', `${verntype}-automat (${vd.std})`) +
+    row('I1-faktor (ikke-utkobling, 1t)', `${vd.i1}`) +
+    row('I2-faktor (garantert utkobling, 1t)', `${vd.i2}`) +
+    row('I4-faktor (magnetisk nedre)', `${vd.i4} × In`) +
+    row('I5-faktor (magnetisk øvre)', `${vd.i5} × In`) +
+    row(`Øvre prøvestrøm I₂ = ${i2f} × ${In} A`, `${I2.toFixed(2)} A`) +
+    (kf !== 1.00 ? row(`Strømf. Iz_tab (${csEnd} mm², metode ${metode})`, `${IzTab.toFixed(1)} A`) + row(`Korreksjonsfaktor kf (${temp} °C, Tabell 6.2d)`, `${kf.toFixed(2)}`) : '') +
+    row(`Strømf. Iz${kf !== 1.00 ? ' (korrigert)' : ''} (${csEnd} mm², metode ${metode})`, `${IzFinal.toFixed(1)} A`) +
+    (storKabel ? row('Kontroll: I₂ ≤ Iz × 1,45', `${I2.toFixed(2)} ≤ ${krav2verdi} A`) : row('Kontroll: I₂ ≤ Iz', `${I2.toFixed(2)} ≤ ${IzFinal.toFixed(1)} A`));
+
+  document.getElementById('badge-krav2').innerHTML =
+    badge(krav2ok, krav2ok
+      ? `Oppfylt — I₂ ${I2.toFixed(2)} A ≤ ${krav2verdi} A`
+      : `Ikke oppfylt — I₂ ${I2.toFixed(2)} A > ${krav2verdi} A`);
+
+  // IK2PMIN — visning (csEnd nå kjent)
+  const rfase_vis = RHO[csEnd];
+  const denom_vis = 2 * 1.2 * (Zytre + rfase_vis * L);
+  const ik2pmin_final = (0.9 * Un_ik) / denom_vis;
+
+  document.getElementById('f-ik').textContent =
+    `Ik2pmin = (0,9 × Un) / (2 × 1,2 × (Zytre + (rfase × l))\n` +
+    `Ik2pmin = (0,9 × ${Un_ik}) / (2 × 1,2 × (${Zytre} + (${rfase_vis} × ${L}))\n` +
+    `Ik2pmin = ${(ik2pmin_final * 1000).toFixed(1)} A  =  ${ik2pmin_final.toFixed(4)} kA`;
+
+  document.getElementById('rows-ik').innerHTML =
+    row('Systemspenning Un', `${Un_ik} V`) +
+    row('Minste kortslutningsstrøm i fordeling', `${ik_fordeling} kA`) +
+    row(`Zytre fra Tabell 5.6b (${Un_ik} V, ${ik_fordeling} kA)`, `${Zytre} mΩ/fase`) +
+    row(`rfase ved ${csEnd} mm² Cu (Tabell 5.6c, 20°C)`, `${RHO[csEnd]} mΩ/m`) +
+    row('Kabellengde l', `${L} m`) +
+    row('Kabelbidrag rfase × l', `${(rfase_vis * L).toFixed(1)} mΩ`) +
+    row('Total impedans 2 × 1,2 × (Zytre + rfase × l)', `${denom_vis.toFixed(1)} mΩ`) +
+    row('Ik2pmin', `${(ik2pmin_final * 1000).toFixed(1)} A`) +
+    row(`I5-faktor (${verntype}-automat)`, `${I5} × In = ${I5} × ${In} = ${I5_grense.toFixed(1)} A`) +
+    row('Kontroll: Ik2pmin ≥ I5 × In', `${(ik2pmin_final * 1000).toFixed(1)} ≥ ${I5_grense.toFixed(1)} A`);
+
+  document.getElementById('badge-ik').innerHTML =
+    badge(ikOk,
+      ikOk
+        ? `Oppfylt — Ik2pmin = ${(ik2pmin_final*1000).toFixed(1)} A ≥ I5 × In = ${I5_grense.toFixed(1)} A`
+        : `Ikke oppfylt — Ik2pmin = ${(ik2pmin_final*1000).toFixed(1)} A < I5 × In = ${I5_grense.toFixed(1)} A (øk tverrsnitt eller kortere kurs)`);
+
+  document.getElementById('result-cards').innerHTML = `
+    <div class="metric">
+      <div class="metric-label">Tverrsnitt</div>
+      <div class="metric-value">${csEnd} mm²</div>
+      <div class="metric-sub">Cu/PVC — maks av krav 1, 2, ΔU</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">Sikring I<sub>n</sub></div>
+      <div class="metric-value">${In} A</div>
+      <div class="metric-sub">${verntype}-automat / sikring</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">Strømf. I<sub>z</sub>${kf !== 1.00 ? ' (korr.)' : ''}</div>
+      <div class="metric-value">${IzFinal.toFixed(1)} A</div>
+      <div class="metric-sub">Metode ${metode}, ${ledere} led.${kf !== 1.00 ? ` × kf ${kf.toFixed(2)} (${temp} °C)` : ''}</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">Spenningsfall ΔU</div>
+      <div class="metric-value">${du_pct_end.toFixed(2)} %</div>
+      <div class="metric-sub">Grense: ${grense} % — ${du_pct_end <= grense ? 'ok' : 'over'}</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">Ik2pmin</div>
+      <div class="metric-value">${(ik2pmin_final*1000).toFixed(0)} A</div>
+      <div class="metric-sub">Krav: I5 × In = ${I5} × ${In} = ${I5_grense.toFixed(0)} A — ${ikOk ? 'ok' : 'ikke ok'}</div>
+    </div>
+  `;
+
+  const begrunnelse = [];
+  const cs1idx = SIZES.indexOf(findMinCs(metode, ledere, In) || 1.5);
+  const cs2idx = SIZES.indexOf(cs2 || 1.5);
+  const csSFidx = SIZES.indexOf(csSF);
+  if(idxFinal === csSFidx && csSFidx >= cs1idx && csSFidx >= cs2idx)
+    begrunnelse.push(`tverrsnitt styrt av spenningsfall (ΔU = ${du_pct_sf.toFixed(2)} %)`);
+  else if(idxFinal === cs2idx && cs2idx >= cs1idx)
+    begrunnelse.push(`tverrsnitt styrt av Krav 2 (I₂ = ${I2.toFixed(2)} A)`);
+  else
+    begrunnelse.push(`tverrsnitt tilstrekkelig for Krav 1 (Ib = ${Ib.toFixed(1)} A)`);
+
+  document.getElementById('result-note').textContent =
+    `Dimensjonerende faktor: ${begrunnelse[0]}. Kabel: NYM-J ${ledere === 3 ? '3' : '2'}×${csEnd} mm² Cu/PVC, In = ${In} A.`;
+
+  const allOk = krav1ok && krav2ok && sfOk && ikOk;
+  const bar = document.getElementById('summary-bar');
+  bar.className = 'summary-bar ' + (allOk ? 'ok' : 'fail');
+  bar.querySelector('.icon').textContent = allOk ? '✓' : '✕';
+  document.getElementById('summary-text').textContent = allOk
+    ? `Alle krav oppfylt — kabel: ${csEnd} mm² Cu/PVC, In = ${In} A (${verntype}), ΔU = ${du_pct_end.toFixed(2)} %, Ik2pmin = ${(ik2pmin_final*1000).toFixed(0)} A`
+    : `Ett eller flere krav ikke oppfylt — se detaljer i kortene nedenfor`;
+  oppdaterKursStatus('b', allOk);
+}
+
+document.querySelectorAll('#side-bolig select, #side-bolig input').forEach(el => el.addEventListener('input', calc));
+document.querySelectorAll('#side-naring select, #side-naring input').forEach(el => el.addEventListener('input', calcNaring));
+
+// Kurs-håndtering
+const kursState = { b: { kurs: [], aktiv: 0 }, n: { kurs: [], aktiv: 0 } };
+
+function leggTilKurs(pfx) {
+  const st = kursState[pfx];
+  const nr = st.kurs.length + 1;
+  st.kurs.push({ navn: `Kurs ${nr}`, ok: null });
+  byttKurs(pfx, st.kurs.length - 1);
+}
+
+function byttKurs(pfx, idx) {
+  const st = kursState[pfx];
+  if(idx < 0 || idx >= st.kurs.length) return;
+  if(st.kurs[st.aktiv]) lagre(pfx, st.aktiv);
+  st.aktiv = idx;
+  gjenopprett(pfx, idx);
+  renderKursList(pfx);
+  if(pfx === 'b') calc(); else calcNaring();
+}
+
+function lagre(pfx, idx) {
+  const p = pfx === 'b' ? '' : 'n-';
+  const get = id => { const el = document.getElementById(p+id); return el ? el.value : ''; };
+  kursState[pfx].kurs[idx].data = {
+    metode: get('metode'), ledere: get('ledere'), ib: get('ib'),
+    verntype: get('verntype'), grense: get('grense'), lengde: get('lengde'),
+    ik_fordeling: get('ik_fordeling'), ik3pmax: get('ik3pmax'), netttype: get('netttype'),
+    temp: get('temp')
+  };
+}
+
+function gjenopprett(pfx, idx) {
+  const p = pfx === 'b' ? '' : 'n-';
+  const d = kursState[pfx].kurs[idx].data;
+  if(!d) return;
+  const set = (id, val) => { const el = document.getElementById(p+id); if(el) el.value = val; };
+  set('metode', d.metode); set('ledere', d.ledere); set('ib', d.ib);
+  set('verntype', d.verntype); set('grense', d.grense); set('lengde', d.lengde);
+  set('ik_fordeling', d.ik_fordeling); set('ik3pmax', d.ik3pmax); set('netttype', d.netttype);
+  if(d.temp) set('temp', d.temp);
+}
+
+function slettKurs(pfx, idx) {
+  const st = kursState[pfx];
+  if(st.kurs.length <= 1) return; // alltid minst 1 kurs
+  lagre(pfx, st.aktiv);
+  st.kurs.splice(idx, 1);
+  st.aktiv = Math.min(st.aktiv, st.kurs.length - 1);
+  gjenopprett(pfx, st.aktiv);
+  renderKursList(pfx);
+  if(pfx === 'b') calc(); else calcNaring();
+}
+
+function renderKursList(pfx) {
+  const st = kursState[pfx];
+  const list = document.getElementById(`${pfx}-kurs-list`);
+  if(!list) return;
+  list.innerHTML = st.kurs.map((k, i) => `
+    <div style="display:flex;gap:4px;align-items:center;">
+      <button class="kurs-btn${i === st.aktiv ? ' active' : ''}" style="flex:1" onclick="byttKurs('${pfx}', ${i})">
+        <span>${k.navn}</span>
+        <span class="kurs-status">${k.ok === true ? '✓' : k.ok === false ? '✕' : ''}</span>
+      </button>
+      ${st.kurs.length > 1 ? `<button class="kurs-del-btn" onclick="slettKurs('${pfx}', ${i})" title="Slett kurs">×</button>` : ''}
+    </div>
+  `).join('');
+}
+
+function oppdaterKursStatus(pfx, ok) {
+  const st = kursState[pfx];
+  st.kurs[st.aktiv].ok = ok;
+  renderKursList(pfx);
+}
+
+function visside(side, knapp) {
+  ['bolig','naring','motor','ov','jording'].forEach(s => {
+    document.getElementById('side-'+s).style.display = side === s ? '' : 'none';
+  });
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  knapp.classList.add('active');
+  if(side === 'naring') calcNaring();
+  if(side === 'motor') calcMotor();
+  if(side === 'ov') calcOV();
+  if(side === 'jording') calcJording();
+}
+
+function visOvSide(side) {
+  document.getElementById('ov-bolig-content').style.display  = side === 'bolig'  ? '' : 'none';
+  document.getElementById('ov-naring-content').style.display = side === 'naring' ? '' : 'none';
+  document.getElementById('ov-btn-bolig').className  = 'kurs-btn' + (side === 'bolig'  ? ' active' : '');
+  document.getElementById('ov-btn-naring').className = 'kurs-btn' + (side === 'naring' ? ' active' : '');
+}
+
+function sfFaktor(antall, erBolig) {
+  if(antall <= 1)  return 1.0;
+  if(antall <= 3)  return erBolig ? 0.8 : 0.9;
+  if(antall <= 5)  return erBolig ? 0.7 : 0.8;
+  if(antall <= 9)  return erBolig ? 0.6 : 0.7;
+  return erBolig ? 0.5 : 0.6;
+}
+
+function calcOV() {
+  ['b','n'].forEach(pfx => {
+    const erBolig = pfx === 'b';
+    const st = kursState[pfx];
+    const kurser = st.kurs;
+    const antall = kurser.length;
+    const sf = sfFaktor(antall, erBolig);
+    const netttype = document.getElementById(`ov-${pfx}-netttype`)?.value || 'TN';
+    const metodOV  = document.getElementById(`ov-${pfx}-metode`)?.value  || 'C';
+    const U = netttype === 'IT' ? 230 : 400;
+    const sqrt3 = Math.sqrt(3);
+
+    // Beregn Ptot fra hver kurs
+    let ptot = 0;
+    const kursRader = kurser.map((k, i) => {
+      const d = k.data || {};
+      const Ib = parseFloat(d.ib) || 0;
+      const ledereVal = d.ledere || '2_230';
+      const [lStr, uStr] = ledereVal.split('_');
+      const leder = parseInt(lStr);
+      const Ukurs = parseInt(uStr) || 230;
+      // P = U × I (enfase) eller √3 × U × I (trefase)
+      const P = leder === 3 ? sqrt3 * Ukurs * Ib : Ukurs * Ib;
+      const formel = leder === 3 ? `√3 × ${Ukurs} × ${Ib.toFixed(1)}` : `${Ukurs} × ${Ib.toFixed(1)}`;
+      ptot += P;
+      return `<tr><td>${k.navn}</td><td>${Ib.toFixed(1)} A</td><td>${leder} led. / ${Ukurs} V</td><td>${formel} = ${Math.round(P)} W</td></tr>`;
+    }).join('');
+
+    const marginEl = document.getElementById(`ov-${pfx}-margin`);
+    const margin = (parseFloat(marginEl ? marginEl.value : 20) || 0) / 100;
+    const marginFaktor = 1 + margin;
+    const i2_ov = parseFloat(document.getElementById(`ov-${pfx}-i2`)?.value) || 1.45;
+    const i5_ov = parseFloat(document.getElementById(`ov-${pfx}-i5`)?.value) || 800;
+
+    const OV_A = (ptot * sf) / (sqrt3 * U);
+    const OV_med_margin = OV_A * marginFaktor;
+    const In_ov = nextSikring(OV_med_margin);
+
+    // Inntakskabel: finn minste tverrsnitt der Iz ≥ OV_med_margin OG Iz ≥ I₂ av OV-vernet
+    const I2_ov = i2_ov * In_ov;
+    const minIz = Math.max(OV_med_margin, I2_ov);
+    const csInntak = findMinCs(metodOV, 3, minIz) || 120;
+    const IzInntak = IZ[metodOV]?.[3]?.[csInntak] || 0;
+    const izOk = IzInntak >= I2_ov;
+
+    const rowEl   = document.getElementById(`ov-${pfx}-rows`);
+    const tabEl   = document.getElementById(`ov-${pfx}-tabell`);
+    const resEl   = document.getElementById(`ov-${pfx}-result`);
+
+    tabEl.innerHTML = `
+      <table class="krav-table" style="margin-bottom:8px;">
+        <tr style="font-weight:500;font-size:12px;color:var(--text-3);">
+          <td>Kurs</td><td>Ib (A)</td><td>System</td><td>P (W)</td>
+        </tr>
+        ${kursRader}
+      </table>`;
+
+    rowEl.innerHTML =
+      `<tr><td>Antall kurser</td><td>${antall}</td></tr>` +
+      `<tr><td>Samtidighetsfaktor Sf (Tabell 5.4c, ${erBolig ? 'bolig' : 'næring'})</td><td>${sf}</td></tr>` +
+      `<tr><td>Total installert effekt Ptot (sum alle kurser)</td><td>${Math.round(ptot)} W</td></tr>` +
+      `<tr><td>Netttype</td><td>${netttype} — U = ${U} V</td></tr>` +
+      `<tr><td>Forleggingsmetode inntakskabel</td><td>Metode ${metodOV}</td></tr>` +
+      `<tr><td>OV = (Ptot × Sf) / (√3 × U<sub>nett</sub>)</td><td>${OV_A.toFixed(2)} A</td></tr>` +
+      `<tr><td>Sikkerhetsmargin (${Math.round(margin*100)} %)</td><td>${OV_A.toFixed(2)} × ${marginFaktor.toFixed(2)} = ${OV_med_margin.toFixed(2)} A</td></tr>` +
+      `<tr><td>Valgt OV-vern In</td><td>${In_ov} A</td></tr>` +
+      `<tr><td>I₂ = ${i2_ov} × ${In_ov} A</td><td>${I2_ov.toFixed(2)} A</td></tr>` +
+      `<tr><td>I₅ OV-vern (magnetisk øvre grense)</td><td>${i5_ov} A</td></tr>` +
+      `<tr><td>Inntakskabel (metode ${metodOV}, 3 led.)</td><td>${csInntak} mm² Cu/PVC (Iz = ${IzInntak} A)</td></tr>` +
+      `<tr><td>Kontroll: Iz ≥ I₂</td><td>${IzInntak} ≥ ${I2_ov.toFixed(2)} A — ${izOk ? '✓ ok' : '✕ ikke ok'}</td></tr>`;
+
+    resEl.innerHTML = `
+      <div class="result-grid" style="grid-template-columns:repeat(4,1fr);">
+        <div class="metric"><div class="metric-label">OV-strøm m/ margin</div><div class="metric-value">${OV_med_margin.toFixed(1)} A</div><div class="metric-sub">${OV_A.toFixed(2)} × ${marginFaktor.toFixed(2)}</div></div>
+        <div class="metric"><div class="metric-label">OV-vern In</div><div class="metric-value">${In_ov} A</div><div class="metric-sub">Neste standard sikring</div></div>
+        <div class="metric"><div class="metric-label">Inntakskabel</div><div class="metric-value">${csInntak} mm²</div><div class="metric-sub">Metode ${metodOV}, Iz = ${IzInntak} A</div></div>
+        <div class="metric"><div class="metric-label">Iz ≥ I₂</div><div class="metric-value" style="color:${izOk?'var(--ok-text)':'var(--fail-text)'}">${izOk?'✓':'✕'}</div><div class="metric-sub">${IzInntak} ≥ ${I2_ov.toFixed(1)} A</div></div>
+      </div>`;
+  });
+}
+
+// ---- JORDING ----
+
+function bisektJord(f, lo, hi) {
+  for(let i = 0; i < 150; i++) {
+    const mid = (lo + hi) / 2;
+    if(f(lo) * f(mid) <= 0) hi = mid; else lo = mid;
+    if(hi - lo < 0.01) break;
+  }
+  return (lo + hi) / 2;
+}
+
+function jordbandLengde(Ra, rho) {
+  // Horizontal strip 20×3 mm, equivalent radius w/4=0.005 m, depth 0.5 m
+  // Ra = ρ/(2πL) × ln(2L²/(0.005×0.5)) = ρ/(2πL) × ln(800L²)
+  const f = L => rho / (2 * Math.PI * L) * Math.log(800 * L * L) - Ra;
+  if(f(0.5) <= 0) return 0.5;
+  let hi = 2;
+  while(f(hi) > 0 && hi < 32000) hi *= 2;
+  if(f(hi) > 0) return Infinity;
+  return bisektJord(f, 0.5, hi);
+}
+
+function stavLengde(Ra, rho) {
+  // Vertical rod ⌀20 mm: Ra = ρ/(2πL) × (ln(4L/0.02) − 1) = ρ/(2πL) × (ln(200L) − 1)
+  const f = L => rho / (2 * Math.PI * L) * (Math.log(200 * L) - 1) - Ra;
+  if(f(0.5) <= 0) return 0.5;
+  let hi = 2;
+  while(f(hi) > 0 && hi < 16000) hi *= 2;
+  if(f(hi) > 0) return Infinity;
+  return bisektJord(f, 0.5, hi);
+}
+
+function ringMotstand(L, rho) {
+  // Closed square ring electrode, 20×3 mm strip, a=0.005 m equivalent radius
+  // R = ρ/(π×L) × ln(2L/a)  — circular-ring approximation, valid for L >> a
+  if(L <= 0) return Infinity;
+  return rho / (Math.PI * L) * Math.log(2 * L / 0.005);
+}
+
+function ringLengde(Ra, rho) {
+  // Solve ringMotstand(L, rho) = Ra for L
+  const f = L => rho / (Math.PI * L) * Math.log(2 * L / 0.005) - Ra;
+  if(f(1) <= 0) return 1;
+  let hi = 4;
+  while(f(hi) > 0 && hi < 64000) hi *= 2;
+  if(f(hi) > 0) return Infinity;
+  return bisektJord(f, 1, hi);
+}
+
+// Tabell 3.1b — Beregnede verdier (TN-OHM ver. 2.0), frostfritt jordsmonn
+// Line og ringjord bruker samme verdier (line-kolonnen)
+const TABELL_3_1B = {
+  myrjord:    { navn: 'Myrjord',        rho: 30,   spyd: { 1.5: 19,   4.5: 7   }, line: { 10: 4,   50: 1,   100: 0.6 }, plate: { 0.5: 30,   1.0: 16  }, fundamentjord: 2   },
+  matjord:    { navn: 'Matjord/leire',  rho: 100,  spyd: { 1.5: 60,   4.5: 25  }, line: { 10: 14,  50: 4,   100: 2   }, plate: { 0.5: 100,  1.0: 50  }, fundamentjord: 7   },
+  sandjord:   { navn: 'Sandjord',       rho: 200,  spyd: { 1.5: 130,  4.5: 50  }, line: { 10: 30,  50: 8,   100: 4   }, plate: { 0.5: 200,  1.0: 100 }, fundamentjord: 14  },
+  fuktigsand: { navn: 'Fuktig sand',    rho: 300,  spyd: { 1.5: 190,  4.5: 70  }, line: { 10: 45,  50: 12,  100: 6   }, plate: { 0.5: 290,  1.0: 160 }, fundamentjord: 21  },
+  fuktiggrus: { navn: 'Fuktig grus',    rho: 500,  spyd: { 1.5: 310,  4.5: 120 }, line: { 10: 70,  50: 20,  100: 11  }, plate: { 0.5: 490,  1.0: 260 }, fundamentjord: 35  },
+  torrsand:   { navn: 'Tørr sand',      rho: 1000, spyd: { 1.5: 600,  4.5: 250 }, line: { 10: 140, 50: 40,  100: 22  }, plate: { 0.5: 1000, 1.0: 520 }, fundamentjord: 70  },
+  steingrunn: { navn: 'Steingrunn',     rho: 3000, spyd: { 1.5: 1900, 4.5: 740 }, line: { 10: 430, 50: 120, 100: 65  }, plate: { 0.5: 3000, 1.0: 1600}, fundamentjord: 210 },
+};
+
+// Interpolation/extrapolation of Ra for line/ring of arbitrary length L
+function interpolerLineRa(L, jord) {
+  const pts = [[10, jord.line[10]], [50, jord.line[50]], [100, jord.line[100]]];
+  if(L <= 10)  return jord.line[10];
+  if(L >= 100) return jord.line[100] * 100 / L; // 1/L scaling beyond table
+  for(let i = 0; i < pts.length - 1; i++) {
+    const [L1, Ra1] = pts[i], [L2, Ra2] = pts[i + 1];
+    if(L <= L2) return Ra1 + (Ra2 - Ra1) * (L - L1) / (L2 - L1);
+  }
+  return jord.line[100];
+}
+
+function calcJording() {
+  const netttype     = document.getElementById('j-netttype').value;
+  const kabeltype    = document.getElementById('j-kabeltype').value;
+  const trafokva     = parseFloat(document.getElementById('j-trafo').value) || 0;
+  const jfbStorrelse = parseFloat(document.getElementById('j-jfb').value) || 0;
+  const forhandsJfb  = document.querySelector('input[name="j-forhands"]:checked')?.value || 'nei';
+  const forhandsStr  = parseFloat(document.getElementById('j-forhands-storrelse').value) || 0;
+  const jordtypeVal  = document.getElementById('j-jordtype').value;
+
+  const erType1 = kabeltype === '1';
+  document.getElementById('j-forhands-section').style.display        = erType1 ? '' : 'none';
+  document.getElementById('j-jfb-section').style.display             = erType1 ? 'none' : '';
+  document.getElementById('j-forhands-storrelse-section').style.display =
+    (erType1 && forhandsJfb === 'ja') ? '' : 'none';
+
+  const bar     = document.getElementById('j-summary-bar');
+  const icon    = bar.querySelector('.icon');
+  const summTxt = document.getElementById('j-summary-text');
+
+  if(netttype === 'TN') {
+    document.getElementById('j-tn-card').style.display   = '';
+    document.getElementById('j-it-results').style.display = 'none';
+    bar.className = 'summary-bar neutral';
+    icon.textContent  = 'ℹ';
+    summTxt.textContent = 'TN-nett valgt — Ra × Id ≤ Uc-beregning er ikke aktuelt for TN';
+    return;
+  }
+  document.getElementById('j-tn-card').style.display = 'none';
+
+  let Id_mA = 0, Id_kilde = '';
+  if(erType1) {
+    if(forhandsJfb === 'ja' && forhandsStr > 0) {
+      Id_mA    = forhandsStr;
+      Id_kilde = `Forhånds koblet jordfeilbryter: ${forhandsStr} mA`;
+    } else if(trafokva > 0) {
+      Id_mA    = 2 * trafokva;
+      Id_kilde = `2 mA/kVA × ${trafokva} kVA = ${Id_mA} mA  (type 1 kabel, ingen forhånds JFB)`;
+    }
+  } else {
+    if(jfbStorrelse > 0) {
+      Id_mA    = jfbStorrelse;
+      Id_kilde = `Jordfeilbryter: ${jfbStorrelse} mA  (type 2 kabel)`;
+    }
+  }
+
+  if(Id_mA <= 0) {
+    document.getElementById('j-it-results').style.display = 'none';
+    bar.className = 'summary-bar neutral';
+    icon.textContent  = '⚡';
+    summTxt.textContent = 'Fyll inn nødvendige verdier';
+    return;
+  }
+
+  document.getElementById('j-it-results').style.display = '';
+
+  const Id_A  = Id_mA / 1000;
+  const faktor    = parseFloat(document.getElementById('j-faktor').value) || 10;
+  const Uc_eff    = 50 / faktor;
+  const Ra_50     = 50 / Id_A;
+  const Ra_target = Uc_eff / Id_A;
+
+  document.getElementById('j-formel').textContent =
+    `Id = ${Id_mA} mA = ${Id_A.toFixed(4)} A\n` +
+    `Kilde: ${Id_kilde}\n\n` +
+    `Ra maks (Uc = 50 V,  1× — ingen korreksjon): Ra ≤ ${Ra_50.toFixed(2)} Ω\n` +
+    `Ra maks (Uc = ${(50/3).toFixed(1)} V, 3× faktor):           Ra ≤ ${(50/3/Id_A).toFixed(2)} Ω\n` +
+    `Ra maks (Uc = 10 V,   5× faktor):             Ra ≤ ${(10/Id_A).toFixed(2)} Ω\n` +
+    `Ra maks (Uc =  5 V,  10× faktor):             Ra ≤ ${(5/Id_A).toFixed(2)} Ω\n\n` +
+    `Valgt: ${faktor}× faktor → Ra ≤ ${Ra_target.toFixed(2)} Ω (Uc_eff = ${Uc_eff.toFixed(1)} V)`;
+
+  document.getElementById('j-rows-ra').innerHTML =
+    row('Netttype', 'IT-nett') +
+    row('Jordfeilstrøm Id', `${Id_mA} mA = ${Id_A.toFixed(4)} A`) +
+    row('Kilde', Id_kilde) +
+    row('Ra maks — Uc = 50 V (1× ingen korreksjon)',  `${Ra_50.toFixed(2)} Ω`) +
+    row(`Ra maks — Uc = ${(50/3).toFixed(1)} V (3× faktor)`, `${(50/3/Id_A).toFixed(2)} Ω`) +
+    row('Ra maks — Uc = 10 V (5× faktor)',            `${(10/Id_A).toFixed(2)} Ω`) +
+    row('Ra maks — Uc = 5 V (10× faktor)',             `${(5/Id_A).toFixed(2)} Ω`) +
+    row(`<strong>Valgt dimensjoneringsgrunnlag: ${faktor}× faktor</strong>`, `<strong>Ra ≤ ${Ra_target.toFixed(2)} Ω</strong>`);
+
+  document.getElementById('j-ra-metrics').innerHTML = `
+    <div class="metric">
+      <div class="metric-label">Jordfeilstrøm Id</div>
+      <div class="metric-value">${Id_mA >= 1000 ? (Id_mA/1000).toFixed(2)+' A' : Id_mA+' mA'}</div>
+      <div class="metric-sub">${Id_A.toFixed(4)} A</div>
+    </div>
+    <div class="metric" style="border:1px solid var(--ok-border);">
+      <div class="metric-label">Ra maks — Uc = 50 V</div>
+      <div class="metric-value" style="color:var(--ok-text)">${Ra_50.toFixed(1)} Ω</div>
+      <div class="metric-sub">Normal tilstand</div>
+    </div>
+    <div class="metric" style="border:1px solid #e0a030;">
+      <div class="metric-label">Ra maks — ${faktor}× faktor</div>
+      <div class="metric-value" style="color:var(--warn-text)">${Ra_target.toFixed(1)} Ω</div>
+      <div class="metric-sub">Uc_eff = ${Uc_eff.toFixed(1)} V (dimensjoneringsgrunnlag)</div>
+    </div>`;
+
+  // --- Alternativer (Tabell 3.1b, TN-OHM ver. 2.0) ---
+  const jord    = TABELL_3_1B[jordtypeVal];
+  const rekCard = document.getElementById('j-recommendation-card');
+
+  if(!jord) {
+    rekCard.style.display = 'none';
+    bar.className = 'summary-bar neutral';
+    icon.textContent  = '⚡';
+    summTxt.textContent = `IT-nett · Id = ${Id_mA} mA · Ra ≤ ${Ra_50.toFixed(1)} Ω (normal) / ${Ra_target.toFixed(1)} Ω (${faktor}×) — velg jordsmonn`;
+    return;
+  }
+
+  rekCard.style.display = '';
+  const omkrets = parseFloat(document.getElementById('j-omkrets').value) || 0;
+
+  // --- Build one option per electrode type ---
+
+  // Spyd: best size that meets target; fallback = 4,5 m
+  function buildSpyd() {
+    for(const len of [1.5, 4.5]) {
+      const Ra = jord.spyd[len];
+      if(Ra <= Ra_target) return { type:'Spyd', label:`${String(len).replace('.',',')} m`, utforelse:'Spyd ø 12,5 mm', Ra, met:true, pref:1 };
+    }
+    return { type:'Spyd', label:'4,5 m', utforelse:'Spyd ø 12,5 mm', Ra:jord.spyd[4.5], met:false, pref:1 };
+  }
+
+  // Ringjord/Line: best table length; if ring needed wraps around house
+  function buildRing() {
+    let kravLen = null, kravRa = null;
+    for(const len of [10, 50, 100]) {
+      if(jord.line[len] <= Ra_target) { kravLen = len; kravRa = jord.line[len]; break; }
+    }
+    if(!kravLen) { kravLen = 100; kravRa = jord.line[100]; }
+    const met = jord.line[kravLen] <= Ra_target;
+
+    if(omkrets > 0) {
+      const minLen = Math.max(kravLen, omkrets); // ring never shorter than house perimeter
+      const runs   = Math.ceil(kravLen / omkrets);
+      const totLen = runs === 1 ? Math.ceil(Math.max(kravLen, omkrets)) : runs * Math.ceil(omkrets);
+      const Ra_faktisk = interpolerLineRa(Math.max(totLen, 10), jord);
+      const label = runs === 1
+        ? `${Math.ceil(minLen)} m (1 omgang)`
+        : `${totLen} m (${runs} omganger × ${Math.ceil(omkrets)} m)`;
+      return { type:'Ringjord', label, utforelse:'Line 25 mm² Cu, 0,5 m dybde', Ra:Ra_faktisk, met:Ra_faktisk<=Ra_target, pref:2 };
+    }
+    return { type:'Line', label:`${kravLen} m`, utforelse:'Line 25 mm² Cu, 0,5 m dybde', Ra:kravRa, met, pref:2 };
+  }
+
+  // Plate: best size that meets target; fallback = 1,0 m²
+  function buildPlate() {
+    for(const [areal,key] of [[0.5,'0,5 m²'],[1.0,'1,0 m²']]) {
+      const Ra = jord.plate[areal];
+      if(Ra <= Ra_target) return { type:'Plate', label:key, utforelse:'Jordplate, 0,5 m dybde', Ra, met:true, pref:3 };
+    }
+    return { type:'Plate', label:'1,0 m²', utforelse:'Jordplate, 0,5 m dybde', Ra:jord.plate[1.0], met:false, pref:3 };
+  }
+
+  // Fundamentjord: single table value
+  function buildFundamentjord() {
+    const Ra = jord.fundamentjord;
+    return { type:'Fundamentjord', label:'10×5×0,5 m', utforelse:'Armert betong fundament', Ra, met:Ra<=Ra_target, pref:4 };
+  }
+
+  const alts = [buildSpyd(), buildRing(), buildPlate(), buildFundamentjord()];
+
+  // Sort: met first (by pref), then not-met (by Ra asc)
+  alts.sort((a,b) => {
+    if(a.met && !b.met) return -1;
+    if(!a.met && b.met) return 1;
+    if(a.met && b.met)  return a.pref - b.pref;
+    return a.Ra - b.Ra;
+  });
+
+  // Render ranked list
+  const rankStyle = [
+    'background:var(--ok-bg);border:1px solid var(--ok-border);',
+    'background:var(--ok-bg);border:1px solid var(--ok-border);',
+    'background:var(--warn-bg);border:1px solid #e0b040;',
+    'background:var(--surface2);border:1px solid var(--border);',
+  ];
+  const rankBadgeBg = ['var(--accent)','var(--accent)','#9a6700','var(--text-3)'];
+
+  const rows = alts.map((a, i) => {
+    const rank   = i + 1;
+    const Uc_el  = (a.Ra * Id_A).toFixed(1);                  // touch voltage normal
+    const Uc_w   = (a.Ra * Id_A * faktor).toFixed(1);         // touch voltage worst-case
+    const UcCol  = parseFloat(Uc_w) <= 50 ? 'var(--ok-text)' : 'var(--fail-text)';
+    const style  = a.met ? rankStyle[Math.min(rank-1,1)] : rankStyle[2 + (rank > 3 ? 1 : 0)];
+    const badgeBg = a.met ? rankBadgeBg[Math.min(rank-1,1)] : '#9a6700';
+    const status = a.met
+      ? `<span style="color:var(--ok-text);font-weight:600;font-size:12px;">✓ Oppfylt</span>`
+      : `<span style="color:var(--fail-text);font-weight:600;font-size:12px;">✗ Ikke oppfylt</span>`;
+    return `
+      <div style="${style}border-radius:var(--radius-sm);padding:10px 14px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+        <div style="width:26px;height:26px;background:${badgeBg};color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;">${rank}</div>
+        <div style="flex:1;min-width:120px;">
+          <div style="font-weight:600;font-size:13px;">${a.type} — ${a.label}</div>
+          <div style="font-size:11px;color:var(--text-3);margin-top:1px;">${a.utforelse}</div>
+        </div>
+        <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:center;">
+          <div style="text-align:center;min-width:52px;">
+            <div style="font-size:10px;color:var(--text-3);text-transform:uppercase;letter-spacing:.04em;">Ra</div>
+            <div style="font-weight:700;font-size:14px;">${a.Ra < 1 ? a.Ra.toFixed(2) : a.Ra % 1 === 0 ? a.Ra : a.Ra.toFixed(1)} Ω</div>
+          </div>
+          <div style="text-align:center;min-width:64px;">
+            <div style="font-size:10px;color:var(--text-3);text-transform:uppercase;letter-spacing:.04em;">Uc normal</div>
+            <div style="font-weight:700;font-size:14px;">${Uc_el} V</div>
+          </div>
+          <div style="text-align:center;min-width:80px;">
+            <div style="font-size:10px;color:var(--text-3);text-transform:uppercase;letter-spacing:.04em;">Uc (${faktor}×)</div>
+            <div style="font-weight:700;font-size:14px;color:${UcCol};">${Uc_w} V</div>
+          </div>
+          <div style="min-width:80px;text-align:right;">${status}</div>
+        </div>
+      </div>`;
+  }).join('');
+
+  document.getElementById('j-recommendation-content').innerHTML = `
+    <div style="font-size:11px;color:var(--text-3);margin-bottom:8px;padding-bottom:6px;border-bottom:0.5px solid var(--border);">
+      Rangert etter anbefaling · Dimensjoneringsgrunnlag: ${faktor}× faktor → Ra ≤ ${Ra_target.toFixed(1)} Ω (Uc_eff = ${Uc_eff.toFixed(1)} V)${omkrets > 0 ? ` · Husets omkrets: ${Math.ceil(omkrets)} m` : ''}
+    </div>
+    <div style="display:flex;flex-direction:column;gap:6px;">${rows}</div>`;
+
+  document.getElementById('j-recommendation-note').textContent =
+    `Kilde: Tabell 3.1b (TN-OHM ver. 2.0), frostfritt jordsmonn. Ra-verdier er tabellverdier (line/ringjord: interpolert for mellomliggende lengder). Uc = Ra × Id (normal) · Uc (${faktor}×) = Ra × Id × ${faktor}.`;
+
+  const antMet = alts.filter(a => a.met).length;
+  bar.className       = 'summary-bar ' + (antMet > 0 ? 'ok' : 'fail');
+  icon.textContent    = antMet > 0 ? '✓' : '⚠';
+  summTxt.textContent = antMet > 0
+    ? `${alts[0].type} anbefalt · ${alts[0].label} · Ra = ${alts[0].Ra < 1 ? alts[0].Ra.toFixed(2) : alts[0].Ra} Ω · ${antMet} av 4 alternativer oppfyller krav`
+    : `Ingen standardelektroder oppfyller Ra ≤ ${Ra_target.toFixed(1)} Ω for ${jord.navn} — kontakt fagkyndig`;
+}
+
+document.querySelectorAll('#side-jording select, #side-jording input').forEach(el =>
+  el.addEventListener('input', calcJording)
+);
+
+// Init
+leggTilKurs('b');
+leggTilKurs('n');
+calc();
+calcJording();
+calcMotor();
+
+function calcNaring() {
+  const pfx = 'n-';
+  const g = id => document.getElementById(pfx + id);
+  const metode    = g('metode').value;
+  const ledereVal = g('ledere').value;
+  const [lStr, uStr] = ledereVal.split('_');
+  const ledere    = parseInt(lStr);
+  const U_kurs    = parseInt(uStr);
+  const Ib        = parseFloat(g('ib').value) || 0;
+  const verntype  = g('verntype').value;
+  const grense    = parseFloat(g('grense').value) || 5;
+  const L         = parseFloat(g('lengde').value) || 0;
+  const netttype  = g('netttype').value;
+  const temp      = parseInt(g('temp').value) || 30;
+  const kf        = KF_PVC[temp] ?? 1.00;
+
+  const U_sf  = U_kurs;
+  const ik_spenning = netttype === 'IT' ? 230 : 400;
+  const In    = nextSikring(Ib);
+  const i2f   = I2F[verntype] || 1.45;
+  const I2    = i2f * In;
+  const vd    = VERN_DATA[verntype] || VERN_DATA.C;
+
+  // Næring: Krav 2 er I₂ ≤ Iz_eff × 1,45 → Iz_tab × kf ≥ I₂/1,45 → Iz_tab ≥ In/kf
+  const cs2 = findMinCs(metode, ledere, I2 / (i2f * kf));
+
+  const RHO_SF    = 0.018;
+  const cs2idx_sf = SIZES.indexOf(cs2 || 1.5);
+  let csSF = null, du_v_sf = 0, du_pct_sf = 0;
+  for(let i = cs2idx_sf; i < SIZES.length; i++){
+    const s = SIZES[i];
+    const du_v = (Ib * RHO_SF * L * 2) / s;
+    const du_pct = (du_v / U_sf) * 100;
+    if(du_pct <= grense){ csSF = s; du_v_sf = du_v; du_pct_sf = du_pct; break; }
+  }
+  if(!csSF){ csSF = 120; du_v_sf = (Ib*RHO_SF*L*2)/120; du_pct_sf=(du_v_sf/U_sf)*100; }
+  const sfOk = du_pct_sf <= grense;
+
+  const ik_fordeling = parseFloat(g('ik_fordeling').value);
+  const Zytre     = ZYTRE[ik_spenning]?.[ik_fordeling] ?? 86;
+  const Un_ik     = U_kurs;
+  const I5        = vd.i5;
+  const I5_grense = I5 * In;
+
+  let csIk = null, ik2pmin_val = 0;
+  for(const s of SIZES){
+    const rfase = RHO[s];
+    const denom = 2 * 1.2 * (Zytre + (rfase * L));
+    const ik    = (0.9 * Un_ik) / denom;
+    ik2pmin_val = ik;
+    if(ik * 1000 >= I5_grense){ csIk = s; break; }
+  }
+  if(!csIk){ csIk=120; const rfase=RHO[120]; const denom=2*1.2*(Zytre+(rfase*L)); ik2pmin_val=(0.9*Un_ik)/denom; }
+  const ikOk = ik2pmin_val * 1000 >= I5_grense;
+
+  // Nasjonale tilpasninger
+  const csNasj = csNasjTilpasning(metode, In);
+
+  const idxFinal = Math.max(
+    SIZES.indexOf(findMinCs(metode, ledere, In / kf) || 1.5),
+    SIZES.indexOf(cs2 || 1.5),
+    SIZES.indexOf(csSF),
+    SIZES.indexOf(csIk || 1.5),
+    SIZES.indexOf(csNasj)
+  );
+  const csEnd   = SIZES[idxFinal];
+  const IzTab   = IZ[metode]?.[ledere]?.[csEnd] || 0;
+  const IzFinal = IzTab * kf;
+  const du_v_end   = (Ib * RHO_SF * L * 2) / csEnd;
+  const du_pct_end = (du_v_end / U_sf) * 100;
+
+  // Næringsdrivende: alltid Ib ≤ In ≤ Iz og I₂ ≤ Iz × 1,45
+  const krav1ok    = (Ib <= In) && (In <= IzFinal);
+  const krav2ok    = I2 <= IzFinal * 1.45;
+  const krav2verdi = (IzFinal * 1.45).toFixed(2);
+
+  const rfase_vis = RHO[csEnd];
+  const denom_vis = 2 * 1.2 * (Zytre + (rfase_vis * L));
+  const ik2pmin_final = (0.9 * Un_ik) / denom_vis;
+
+  g('f-krav1').textContent =
+    `Krav 1 (næring):  Ib ≤ In ≤ Iz\n${Ib.toFixed(1)} ≤ ${In} ≤ ${IzFinal.toFixed(1)} A`;
+  g('rows-krav1').innerHTML =
+    row('Belastningsstrøm I<sub>B</sub>', `${Ib.toFixed(1)} A`) +
+    row('Neste standard sikring I<sub>n</sub> (NEK EN 60898)', `${In} A`) +
+    (kf !== 1.00 ? row(`Strømf. Iz_tab (${csEnd} mm², metode ${metode})`, `${IzTab.toFixed(1)} A`) + row(`Korreksjonsfaktor kf (${temp} °C, Tabell 6.2d)`, `${kf.toFixed(2)}`) : '') +
+    row(`Strømf. Iz${kf !== 1.00 ? ' (korrigert)' : ''} (${csEnd} mm², metode ${metode})`, `${IzFinal.toFixed(1)} A`) +
+    row('Kontroll: Ib ≤ In ≤ Iz', `${Ib.toFixed(1)} ≤ ${In} ≤ ${IzFinal.toFixed(1)} A`);
+  g('badge-krav1').innerHTML = badge(krav1ok, krav1ok
+    ? `Oppfylt — Ib ${Ib.toFixed(1)} A ≤ In ${In} A ≤ Iz ${IzFinal.toFixed(1)} A`
+    : `Ikke oppfylt — In ${In} A > Iz ${IzFinal.toFixed(1)} A`);
+
+  g('f-krav2').textContent =
+    `Krav 2 (næring):  I₂ ≤ Iz × 1,45\n${I2.toFixed(2)} A  ≤  ${krav2verdi} A`;
+  g('rows-krav2').innerHTML =
+    row('Verntype', `${verntype}-automat (${vd.std})`) +
+    row('I1-faktor (ikke-utkobling, 1t)', `${vd.i1}`) +
+    row('I2-faktor (garantert utkobling, 1t)', `${vd.i2}`) +
+    row('I4-faktor (magnetisk nedre)', `${vd.i4} × In`) +
+    row('I5-faktor (magnetisk øvre)', `${vd.i5} × In`) +
+    row(`Øvre prøvestrøm I₂ = ${i2f} × ${In} A`, `${I2.toFixed(2)} A`) +
+    (kf !== 1.00 ? row(`Strømf. Iz_tab (${csEnd} mm², metode ${metode})`, `${IzTab.toFixed(1)} A`) + row(`Korreksjonsfaktor kf (${temp} °C, Tabell 6.2d)`, `${kf.toFixed(2)}`) : '') +
+    row(`Strømf. Iz${kf !== 1.00 ? ' (korrigert)' : ''} (${csEnd} mm², metode ${metode})`, `${IzFinal.toFixed(1)} A`) +
+    row('Iz × 1,45', `${krav2verdi} A`) +
+    row('Kontroll: I₂ ≤ Iz × 1,45', `${I2.toFixed(2)} ≤ ${krav2verdi} A`);
+  g('badge-krav2').innerHTML = badge(krav2ok, krav2ok
+    ? `Oppfylt — I₂ ${I2.toFixed(2)} A ≤ Iz × 1,45 = ${krav2verdi} A`
+    : `Ikke oppfylt — I₂ ${I2.toFixed(2)} A > Iz × 1,45 = ${krav2verdi} A`);
+
+  // Nasjonale tilpasninger — visning
+  const isAgroup = ['A1','A2'].includes(metode);
+  const nasjStyrt = SIZES.indexOf(csNasj) === idxFinal && csNasj <= 4;
+  let nasjRegel = '';
+  if (isAgroup) {
+    if (In <= 10)       nasjRegel = `In ${In} A ≤ 10 A (A1/A2) → min 1,5 mm²`;
+    else if (In <= 16)  nasjRegel = `In ${In} A ≤ 16 A (A1/A2) → min 2,5 mm²`;
+    else                nasjRegel = `In ${In} A > 16 A (A1/A2) → min 4 mm²`;
+  } else {
+    if (In <= 13)       nasjRegel = `In ${In} A ≤ 13 A → min 1,5 mm²`;
+    else if (In <= 16)  nasjRegel = `In ${In} A ≤ 16 A → min 2,5 mm²`;
+    else                nasjRegel = `In ${In} A > 16 A → min 4 mm²`;
+  }
+  g('f-nasj').textContent =
+    `Metodegruppe: ${isAgroup ? 'A (A1/A2)' : 'B/C/D/E/F/G'}\n` +
+    `Gjeldende regel: ${nasjRegel}\n` +
+    `Nasjonalt minstekrav: ${csNasj} mm²`;
+  g('rows-nasj').innerHTML =
+    row('Vernstørrelse In', `${In} A`) +
+    row('Forleggingsmetode', metode) +
+    row('Metodegruppe', isAgroup ? 'A (A1/A2) — strengere terskel' : 'B1/B2/C/D2/E/F') +
+    row('Nasjonalt minstekrav A (§524.1 NA)', nasjRegel) +
+    row('Nasjonalt minstekrav tverrsnitt', `${csNasj} mm²`) +
+    row('Valgt tverrsnitt csEnd', `${csEnd} mm²`) +
+    row('Styrer dimensjonering', nasjStyrt ? 'Ja — nasjonale tilpasninger avgjør' : 'Nei — annet krav er strengere');
+  g('badge-nasj').innerHTML = badge(true, `Nasjonalt krav: min ${csNasj} mm² — valgt ${csEnd} mm²`);
+
+  g('f-sf').textContent =
+    `ΔU = (Ib × ρ × L × 2) / A\n` +
+    `ΔU = (${Ib.toFixed(1)} × 0,018 × ${L} × 2) / ${csSF}\n` +
+    `ΔU = ${du_v_sf.toFixed(3)} V  →  ΔU% = (ΔU / ${U_sf}) × 100 = ${du_pct_sf.toFixed(2)} %`;
+  g('rows-sf').innerHTML =
+    row('Belastningsstrøm Ib', `${Ib.toFixed(1)} A`) +
+    row('Resistivitet ρ (Cu, fast)', `0,018 Ω`) +
+    row('Kurslengde L', `${L} m`) +
+    row('Ledertverrsnitt A', `${csSF} mm²`) +
+    row('Spenningsfall ΔU = (Ib × ρ × L × 2) / A', `${du_v_sf.toFixed(3)} V`) +
+    row('Referansespenning U', `${U_sf} V`) +
+    row('Prosentvis ΔU% = (ΔU / U) × 100', `${du_pct_sf.toFixed(2)} % (grense: ${grense} %)`) +
+    row('Kontroll: ΔU% ≤ grense', `${du_pct_sf.toFixed(2)} ≤ ${grense} %`);
+  g('badge-sf').innerHTML = badge(sfOk, sfOk
+    ? `Oppfylt — ΔU = ${du_pct_sf.toFixed(2)} % ≤ ${grense} %`
+    : `Ikke oppfylt — ΔU = ${du_pct_sf.toFixed(2)} % > ${grense} %`);
+
+  g('f-ik').textContent =
+    `Ik2pmin = (0,9 × Un) / (2 × 1,2 × (Zytre + (rfase × l))\n` +
+    `Ik2pmin = (0,9 × ${Un_ik}) / (2 × 1,2 × (${Zytre} + (${rfase_vis} × ${L}))\n` +
+    `Ik2pmin = ${(ik2pmin_final * 1000).toFixed(1)} A  =  ${ik2pmin_final.toFixed(4)} kA`;
+  g('rows-ik').innerHTML =
+    row('Systemspenning Un', `${Un_ik} V`) +
+    row('Minste kortslutningsstrøm i fordeling', `${ik_fordeling} kA`) +
+    row(`Zytre fra Tabell 5.6b (${Un_ik} V, ${ik_fordeling} kA)`, `${Zytre} mΩ/fase`) +
+    row(`rfase ved ${csEnd} mm² Cu (Tabell 5.6c, 20°C)`, `${RHO[csEnd]} mΩ/m`) +
+    row('Kabellengde l', `${L} m`) +
+    row('Kabelbidrag rfase × l', `${(rfase_vis * L).toFixed(1)} mΩ`) +
+    row('Total impedans 2 × 1,2 × (Zytre + rfase × l)', `${denom_vis.toFixed(1)} mΩ`) +
+    row('Ik2pmin', `${(ik2pmin_final * 1000).toFixed(1)} A`) +
+    row(`I5-faktor (${verntype}-automat)`, `${I5} × In = ${I5} × ${In} = ${I5_grense.toFixed(1)} A`) +
+    row('Kontroll: Ik2pmin ≥ I5 × In', `${(ik2pmin_final * 1000).toFixed(1)} ≥ ${I5_grense.toFixed(1)} A`);
+  g('badge-ik').innerHTML = badge(ikOk, ikOk
+    ? `Oppfylt — Ik2pmin = ${(ik2pmin_final*1000).toFixed(1)} A ≥ I5 × In = ${I5_grense.toFixed(1)} A`
+    : `Ikke oppfylt — Ik2pmin = ${(ik2pmin_final*1000).toFixed(1)} A < I5 × In = ${I5_grense.toFixed(1)} A`);
+
+  g('result-cards').innerHTML = `
+    <div class="metric"><div class="metric-label">Tverrsnitt</div><div class="metric-value">${csEnd} mm²</div><div class="metric-sub">Cu/PVC — maks av alle krav</div></div>
+    <div class="metric"><div class="metric-label">Sikring I<sub>n</sub></div><div class="metric-value">${In} A</div><div class="metric-sub">${verntype}-automat</div></div>
+    <div class="metric"><div class="metric-label">Strømf. I<sub>z</sub>${kf !== 1.00 ? ' (korr.)' : ''}</div><div class="metric-value">${IzFinal.toFixed(1)} A</div><div class="metric-sub">Metode ${metode}, ${ledere} led.${kf !== 1.00 ? ` × kf ${kf.toFixed(2)} (${temp} °C)` : ''}</div></div>
+    <div class="metric"><div class="metric-label">Spenningsfall ΔU</div><div class="metric-value">${du_pct_end.toFixed(2)} %</div><div class="metric-sub">Grense: ${grense} % — ${du_pct_end<=grense?'ok':'over'}</div></div>
+    <div class="metric"><div class="metric-label">Ik2pmin</div><div class="metric-value">${(ik2pmin_final*1000).toFixed(0)} A</div><div class="metric-sub">Krav: I5×In = ${I5}×${In} = ${I5_grense.toFixed(0)} A — ${ikOk?'ok':'ikke ok'}</div></div>
+  `;
+  g('result-note').textContent = `Kabel: NYM-J ${ledere===3?'3':'2'}×${csEnd} mm² Cu/PVC, In = ${In} A. Nasjonalt minstekrav: ${csNasj} mm² (${isAgroup?'A1/A2':'B/C/D/E/F'}).`;
+
+  const allOk = krav1ok && krav2ok && sfOk && ikOk;
+  const bar = document.getElementById('n-summary-bar');
+  bar.className = 'summary-bar ' + (allOk ? 'ok' : 'fail');
+  bar.querySelector('.icon').textContent = allOk ? '✓' : '✕';
+  document.getElementById('n-summary-text').textContent = allOk
+    ? `Alle krav oppfylt — kabel: ${csEnd} mm² Cu/PVC, In = ${In} A (${verntype}), ΔU = ${du_pct_end.toFixed(2)} %`
+    : `Ett eller flere krav ikke oppfylt — se detaljer i kortene nedenfor`;
+  oppdaterKursStatus('n', allOk);
+}
+
+function calcMotor() {
+  const P_avgitt = (parseFloat(document.getElementById('m-p').value) || 0) * 1000;
+  const U        = parseFloat(document.getElementById('m-u').value)     || 230;
+  const f        = parseFloat(document.getElementById('m-f').value)     || 50;
+  const cosPhi   = Math.min(1, Math.max(0.001, parseFloat(document.getElementById('m-cosphi').value) || 0.78));
+  const faser    = parseInt(document.getElementById('m-faser').value)   || 3;
+  const I_raw    = parseFloat(document.getElementById('m-i').value);
+  const hasI     = !isNaN(I_raw) && I_raw > 0;
+
+  const sqrt3    = Math.sqrt(3);
+  const phi_rad  = Math.acos(cosPhi);
+  const phi_deg  = phi_rad * 180 / Math.PI;
+  const tanPhi   = Math.tan(phi_rad);
+
+  const mRow = (label, val) => `<tr><td>${label}</td><td>${val}</td></tr>`;
+
+  // --- Virkningsgrad ---
+  const virkCard = document.getElementById('m-card-virk');
+  let P_tilfort;
+  if (hasI) {
+    virkCard.style.display = '';
+    P_tilfort = faser === 3
+      ? U * I_raw * sqrt3 * cosPhi
+      : U * I_raw * cosPhi;
+    const eta = P_tilfort > 0 ? P_avgitt / P_tilfort : 0;
+    const etaPct = (eta * 100).toFixed(1);
+    const formelStr = faser === 3
+      ? `P-tilført = U × I × √3 × cos φ\n= ${U} V × ${I_raw.toFixed(1)} A × √3 × ${cosPhi}\n= ${P_tilfort.toFixed(0)} W\n\nη = P-avgitt / P-tilført = ${P_avgitt.toFixed(0)} / ${P_tilfort.toFixed(0)} ≈ ${etaPct}%`
+      : `P-tilført = U × I × cos φ\n= ${U} V × ${I_raw.toFixed(1)} A × ${cosPhi}\n= ${P_tilfort.toFixed(0)} W\n\nη = P-avgitt / P-tilført = ${P_avgitt.toFixed(0)} / ${P_tilfort.toFixed(0)} ≈ ${etaPct}%`;
+    document.getElementById('m-f-virk').textContent = formelStr;
+    document.getElementById('m-rows-virk').innerHTML =
+      mRow('P-avgitt (mekanisk effekt ut)', `${(P_avgitt/1000).toFixed(2)} kW = ${P_avgitt.toFixed(0)} W`) +
+      mRow('P-tilført (elektrisk effekt inn)', `${(P_tilfort/1000).toFixed(2)} kW = ${P_tilfort.toFixed(0)} W`) +
+      mRow('Virkningsgrad η', `${etaPct}%`) +
+      mRow('Tapet effekt (varme, friksjon, m.m.)', `${(100 - parseFloat(etaPct)).toFixed(1)}%`);
+  } else {
+    virkCard.style.display = 'none';
+    P_tilfort = P_avgitt;
+  }
+
+  // --- Effektfaktor ---
+  const P_fase = P_tilfort / faser;
+  const approxNote = hasI ? '' : ' (≈ P-avgitt, motorstrøm ikke oppgitt)';
+  const effFormel =
+    `φ = arccos(${cosPhi}) ≈ ${phi_deg.toFixed(1)}°\n` +
+    `P-tilført${approxNote} = ${P_tilfort.toFixed(0)} W\n` +
+    `P per fase = P-tilført / ${faser} = ${P_tilfort.toFixed(0)} / ${faser} = ${P_fase.toFixed(0)} W`;
+  document.getElementById('m-f-eff').textContent = effFormel;
+  document.getElementById('m-rows-eff').innerHTML =
+    mRow('Effektfaktor cos φ', `${cosPhi}`) +
+    mRow('Fasevinkel φ = arccos(' + cosPhi + ')', `${phi_deg.toFixed(1)}°`) +
+    mRow(`Aktiv effekt per fase (P-tilført / ${faser})`, `${P_fase.toFixed(0)} W`);
+
+  // --- Reaktiv induktiv effekt + Kapasistans ---
+  const Q_L  = P_fase * tanPhi;
+  const I_C  = Q_L / U;
+  const X_C  = U / I_C;
+  const C_uF = 1 / (2 * Math.PI * f * X_C) * 1e6;
+  const kapFormel =
+    `Q_L = P × tan φ = ${P_fase.toFixed(0)} × tan(${phi_deg.toFixed(1)}°)\n` +
+    `    = ${P_fase.toFixed(0)} × ${tanPhi.toFixed(3)} = ${Q_L.toFixed(0)} W\n\n` +
+    `Q_L = Q_C  →  I_C = Q_C / U = ${Q_L.toFixed(0)} / ${U} = ${I_C.toFixed(2)} A\n` +
+    `X_C = U / I_C = ${U} / ${I_C.toFixed(2)} = ${X_C.toFixed(1)} Ω\n` +
+    `C = 1 / (2π × f × X_C)\n` +
+    `  = 1 / (2π × ${f} × ${X_C.toFixed(1)}) = ${C_uF.toFixed(0)} μF`;
+  document.getElementById('m-f-kap').textContent = kapFormel;
+  document.getElementById('m-rows-kap').innerHTML =
+    mRow('Reaktiv induktiv effekt Q<sub>L</sub>', `${Q_L.toFixed(0)} VAr`) +
+    mRow('Kompenserende strøm I<sub>C</sub>', `${I_C.toFixed(2)} A`) +
+    mRow('Kapasitiv reaktans X<sub>C</sub>', `${X_C.toFixed(1)} Ω`) +
+    mRow('Nødvendig kapasitans C (per fase)', `<strong>${C_uF.toFixed(0)} μF</strong>`);
+
+  // --- Strømreduksjon ---
+  const I_for    = P_fase / (U * cosPhi);
+  const I_etter  = P_fase / U;
+  const deltaI   = I_for - I_etter;
+  const deltaIPct = I_for > 0 ? (deltaI / I_for * 100).toFixed(1) : '0.0';
+  const stromFormel =
+    `I_før  = P_fase / (U × cos φ) = ${P_fase.toFixed(0)} / (${U} × ${cosPhi}) = ${I_for.toFixed(2)} A\n` +
+    `I_etter = P_fase / (U × 1)    = ${P_fase.toFixed(0)} / ${U} = ${I_etter.toFixed(2)} A\n\n` +
+    `ΔI = I_før − I_etter = ${I_for.toFixed(2)} − ${I_etter.toFixed(2)} = ${deltaI.toFixed(2)} A\n` +
+    `Δi = ΔI / I_før = ${deltaI.toFixed(2)} / ${I_for.toFixed(2)} = ${deltaIPct}%`;
+  document.getElementById('m-f-strom').textContent = stromFormel;
+  document.getElementById('m-rows-strom').innerHTML =
+    mRow('Strøm før kompensering I<sub>før</sub>', `${I_for.toFixed(2)} A`) +
+    mRow('Strøm etter kompensering I<sub>etter</sub>', `${I_etter.toFixed(2)} A`) +
+    mRow('Strømreduksjon ΔI', `${deltaI.toFixed(2)} A`) +
+    mRow('Relativ reduksjon Δi', `<strong>${deltaIPct}%</strong>`);
+}
+
+</script>
+
+</body>
+</html>
