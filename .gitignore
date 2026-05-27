@@ -1,0 +1,10 @@
+.DS_Store
+*.docx
+*.doc
+*.xlsx
+*.pdf
+.agents/
+.claude/
+skills-lock.json
+CLAUDE.md
+Nek 400 kalkulator/
