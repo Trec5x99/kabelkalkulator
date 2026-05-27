@@ -2564,7 +2564,13 @@ async function kjorEksport() {
     lukkEksport();
   } catch(e) {
     console.error('Eksport feil:', e);
-    alert('Eksport feilet: ' + (e.message || String(e)));
+    let msg = e.message || String(e);
+    if (e.properties?.errors?.length) {
+      msg = e.properties.errors
+        .map(err => err.properties?.explanation || err.message || String(err))
+        .join('\n');
+    }
+    alert('Eksport feilet:\n' + msg);
   } finally {
     btn.textContent = orig;
     btn.disabled = false;
