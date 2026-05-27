@@ -2405,9 +2405,9 @@ function byggKursBlokker(pfx) {
       spenningsfallFormel:  `ΔU = 2 × 0,018 × ${L}m × ${_n(r.Ib,1)}A / ${r.csEnd}mm² = ${_n(du_v,2)}V`,
       spenningsfallProsent: `${_n(du_pct,1)}%`,
       spenningsfallStatus:  du_pct <= (parseFloat(d.grense)||5) ? 'OK' : 'IKKE OK',
-      ik2pRfase:            `${_n(r.rfase_end, rfDec)} mΩ/m`,
+      ik2pRfase:            `Rfase: ${_n(r.rfase_end, rfDec)} mΩ/m`,
       ik2pU:                `${r.U_kurs}V`,
-      ik2pZytre:            `${r.Zytre} mΩ`,
+      ik2pZytre:            `Zytre: ${r.Zytre} mΩ`,
       ik2pFormelMedVerdier: `= (0,9 × ${r.U_kurs}) / (2 × 1,2 × (${r.Zytre}mΩ + ${_n(r.rfase_end,rfDec)}mΩ/m × ${L}m))`,
       ik2pResultat:         `       = ${_n(r.ik2pmin_final, 3)} kA  =  ${Math.round(r.ik2pmin_final*1000)}A`,
       ik2pI5Linje:          `I5 = In × ${r.vd.i5}   =   ${r.In}A × ${r.vd.i5} = ${Math.round(r.I5_grense)}A`,
@@ -2551,7 +2551,7 @@ async function kjorEksport() {
     if (!resp.ok) throw new Error(`Klarte ikke laste template.docx (HTTP ${resp.status})`);
     const buf = await resp.arrayBuffer();
     const zip = new PizZip(buf);
-    const doc = new docxtemplater(zip, { paragraphLoop: true, linebreaks: true });
+    const doc = new docxtemplater(zip, { linebreaks: true });
     doc.render(data);
     const blob = doc.getZip().generate({
       type: 'blob',
