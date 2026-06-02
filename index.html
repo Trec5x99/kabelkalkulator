@@ -408,86 +408,103 @@
     line-height: 1.7;
   }
 
-
-  /* ── Export ─────────────────────────────────────────────────────────── */
-  .export-btn {
-    background: rgba(255,255,255,0.12);
-    border: 1px solid rgba(255,255,255,0.20);
-    color: #fff;
-    font-family: inherit;
-    font-size: 13px;
-    font-weight: 500;
-    padding: 7px 14px;
-    border-radius: var(--radius-sm);
-    cursor: pointer;
-    margin-left: auto;
-    transition: background 150ms var(--ease-out);
-    white-space: nowrap;
-  }
-  @media (hover: hover) and (pointer: fine) {
-    .export-btn:hover { background: rgba(255,255,255,0.22); }
-  }
-  .export-backdrop {
+  /* ---- LOGIN ---- */
+  #login-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.46);
-    z-index: 200;
+    z-index: 9999;
+    background: linear-gradient(135deg, #1f4533 0%, #1a3a2a 55%, #14281e 100%);
     display: flex;
     align-items: center;
     justify-content: center;
+    padding: 1rem;
   }
-  .export-backdrop[hidden] { display: none; }
-  .export-panel {
+  .login-card {
     background: var(--surface);
     border-radius: var(--radius-lg);
+    padding: 2rem;
+    width: 100%;
+    max-width: 360px;
     box-shadow: var(--shadow-lg);
-    padding: 1.75rem 2rem;
-    min-width: 300px;
-    max-width: 400px;
-    width: 90%;
   }
-  .export-panel h3 { font-size: 15px; font-weight: 600; margin-bottom: 0.4rem; }
-  .export-panel > p { font-size: 13px; color: var(--text-2); margin-bottom: 0.75rem; }
-  .export-option {
-    display: flex;
-    align-items: center;
-    padding: 7px 10px;
+  .login-head { text-align: center; margin-bottom: 1.5rem; }
+  .login-head .logo { margin: 0 auto 12px; background: var(--accent-light); border: 1px solid rgba(26,58,42,0.15); font-size: 22px; }
+  .login-head h2 { font-size: 16px; font-weight: 600; color: var(--text); }
+  .login-head p  { font-size: 12px; color: var(--text-3); margin-top: 4px; }
+  .login-fields  { display: flex; flex-direction: column; gap: 12px; }
+  .login-fields input[type="text"],
+  .login-fields input[type="password"] {
+    appearance: none;
+    -webkit-appearance: none;
+    background: var(--surface2);
+    border: 0.5px solid var(--border-mid);
     border-radius: var(--radius-sm);
+    padding: 9px 12px;
     font-size: 14px;
-    cursor: pointer;
-    transition: background 100ms;
-  }
-  .export-option:hover { background: var(--surface2); }
-  .export-option label { display: flex; align-items: center; gap: 10px; cursor: pointer; width: 100%; }
-  .export-option input[type="checkbox"] { width: 15px; height: 15px; cursor: pointer; flex-shrink: 0; }
-  .exp-count { color: var(--text-3); font-size: 12px; }
-  .export-actions {
-    display: flex;
-    gap: 10px;
-    justify-content: flex-end;
-    margin-top: 1.25rem;
-    padding-top: 1rem;
-    border-top: 1px solid var(--border);
-  }
-  .export-actions button {
     font-family: inherit;
-    font-size: 13px;
-    font-weight: 500;
-    padding: 8px 16px;
-    border-radius: var(--radius-sm);
-    cursor: pointer;
-    border: 1px solid var(--border-mid);
-    background: var(--surface);
     color: var(--text);
-    transition: background 100ms;
+    width: 100%;
+    outline: none;
+    transition: border-color 150ms var(--ease-out), box-shadow 150ms var(--ease-out);
   }
-  .export-actions button:hover { background: var(--surface2); }
-  .export-actions button.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
-  .export-actions button.primary:hover { background: var(--accent-mid); }
-  .export-actions button:disabled { opacity: 0.5; cursor: not-allowed; }
+  .login-fields input:focus {
+    border-color: var(--accent);
+    background: var(--surface);
+    box-shadow: 0 0 0 3px var(--accent-glow), 0 0 0 1px var(--accent);
+  }
+  #login-error {
+    display: none;
+    background: var(--fail-bg);
+    color: var(--fail-text);
+    border: 1px solid var(--fail-border);
+    border-radius: var(--radius-sm);
+    padding: 9px 12px;
+    font-size: 13px;
+  }
+  #login-btn {
+    width: 100%;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background 150ms var(--ease-out);
+  }
+  @media (hover: hover) and (pointer: fine) { #login-btn:hover { background: var(--accent-mid); } }
+  #login-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+  /* ---- END LOGIN ---- */
+
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@fingerprintjs/fingerprintjs@4/dist/fp.min.js"></script>
 </head>
 <body>
+
+<div id="login-overlay">
+  <div class="login-card">
+    <div class="login-head">
+      <div class="logo">⚡</div>
+      <h2>NEK 400 Kabelkalkulator</h2>
+      <p>Logg inn for å fortsette</p>
+    </div>
+    <div class="login-fields">
+      <div class="field">
+        <label>Brukernavn</label>
+        <input id="login-user" type="text" autocomplete="username">
+      </div>
+      <div class="field">
+        <label>Passord</label>
+        <input id="login-pass" type="password" autocomplete="current-password">
+      </div>
+      <div id="login-error"></div>
+      <button id="login-btn" onclick="doLogin()">Logg inn</button>
+    </div>
+  </div>
+</div>
 
 <header>
   <div class="header-top">
@@ -496,7 +513,6 @@
       <h1>NEK 400 Kabelkalkulator</h1>
       <p>Krav 1 · Krav 2 · Spenningsfall · Motor — NEK 400:2022</p>
     </div>
-    <button class="export-btn" onclick="apneEksport()">Eksporter</button>
   </div>
   <nav>
     <button class="active" onclick="visside('bolig', this)">Bolig</button>
@@ -506,22 +522,6 @@
     <button onclick="visside('jording', this)">Jording</button>
   </nav>
 </header>
-
-<div id="export-backdrop" class="export-backdrop" hidden>
-  <div class="export-panel">
-    <h3>Eksporter utregning</h3>
-    <p>Velg kategorier som skal inkluderes i dokumentet:</p>
-    <div id="exp-row-bolig"  class="export-option"><label><input type="checkbox" id="exp-bolig"> Bolig <span class="exp-count">(<span id="exp-bolig-count">0</span> kurser)</span></label></div>
-    <div id="exp-row-naring" class="export-option"><label><input type="checkbox" id="exp-naring"> Næringsdrivende <span class="exp-count">(<span id="exp-naring-count">0</span> kurser)</span></label></div>
-    <div id="exp-row-motor"  class="export-option"><label><input type="checkbox" id="exp-motor"> Motor</label></div>
-    <div id="exp-row-ov"     class="export-option"><label><input type="checkbox" id="exp-ov"> Overbelastningsvern</label></div>
-    <div id="exp-row-jord"   class="export-option"><label><input type="checkbox" id="exp-jord"> Jording</label></div>
-    <div class="export-actions">
-      <button onclick="lukkEksport()">Avbryt</button>
-      <button id="exp-lastned-btn" class="primary" onclick="kjorEksport()">Last ned</button>
-    </div>
-  </div>
-</div>
 
 <div id="side-bolig">
 <div class="page-layout">
@@ -2272,310 +2272,56 @@ function calcMotor() {
     mRow('Relativ reduksjon Δi', `<strong>${deltaIPct}%</strong>`);
 }
 
-// ── Export ───────────────────────────────────────────────────────────────────
+// ---- AUTH ----
+const _SB_URL = 'https://pgazzkdutypepfvmwoms.supabase.co';
+const _SB_KEY = 'sb_publishable_sj3rtpldFrv0q4lK76nFmA_4Y-oy3na';
+let _sb;
 
-function _n(x, d) { return Number(x).toFixed(d).replace('.', ','); }
-
-function beregnKurs(data, isNaring) {
-  const [lStr, uStr] = (data.ledere || '2_230').split('_');
-  const ledere   = parseInt(lStr);
-  const U_kurs   = parseInt(uStr);
-  const Ib       = parseFloat(data.ib) || 0;
-  const metode   = data.metode || 'B1';
-  const verntype = data.verntype || 'C';
-  const grense   = parseFloat(data.grense) || 5;
-  const L        = parseFloat(data.lengde) || 0;
-  const netttype = data.netttype || 'TN';
-  const temp     = parseInt(data.temp) || 30;
-  const kf       = KF_PVC[temp] ?? 1.00;
-  const ik_spenning = netttype === 'IT' ? 230 : 400;
-  const In  = nextSikring(Ib);
-  const i2f = I2F[verntype] || 1.45;
-  const I2  = i2f * In;
-  const vd  = VERN_DATA[verntype] || VERN_DATA.C;
-
-  const cs2 = isNaring
-    ? findMinCs(metode, ledere, In / kf)
-    : findMinCs(metode, ledere, I2 / kf);
-
-  const cs2idx = SIZES.indexOf(cs2 || 1.5);
-  let csSF = null, du_v_sf = 0, du_pct_sf = 0;
-  for (let i = cs2idx; i < SIZES.length; i++) {
-    const s = SIZES[i], dv = (Ib * 0.018 * L * 2) / s, dp = (dv / U_kurs) * 100;
-    if (dp <= grense) { csSF = s; du_v_sf = dv; du_pct_sf = dp; break; }
-  }
-  if (!csSF) { csSF = 120; du_v_sf = (Ib*0.018*L*2)/120; du_pct_sf=(du_v_sf/U_kurs)*100; }
-
-  const Zytre = ZYTRE[ik_spenning]?.[parseFloat(data.ik_fordeling)||1] ?? 86;
-  const I5_grense = vd.i5 * In;
-  let csIk = null;
-  for (const s of SIZES) {
-    if ((0.9 * U_kurs) / (2 * 1.2 * (Zytre + RHO[s] * L)) * 1000 >= I5_grense) { csIk = s; break; }
-  }
-  if (!csIk) csIk = 120;
-
-  let idxFinal = Math.max(
-    SIZES.indexOf(findMinCs(metode, ledere, In / kf) || 1.5),
-    SIZES.indexOf(cs2 || 1.5),
-    SIZES.indexOf(csSF),
-    SIZES.indexOf(csIk)
+if (sessionStorage.getItem('auth_user')) {
+  document.getElementById('login-overlay').remove();
+} else {
+  _sb = supabase.createClient(_SB_URL, _SB_KEY);
+  ['login-user','login-pass'].forEach(id =>
+    document.getElementById(id).addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); })
   );
-  if (isNaring) idxFinal = Math.max(idxFinal, SIZES.indexOf(csNasjTilpasning(metode, In)));
-
-  const csEnd   = SIZES[idxFinal];
-  const IzTab   = IZ[metode]?.[ledere]?.[csEnd] || 0;
-  const IzFinal = IzTab * kf;
-  const rfase_end = RHO[csEnd];
-  const ik2pmin_final = (0.9 * U_kurs) / (2 * 1.2 * (Zytre + rfase_end * L));
-  const du_v_end   = (Ib * 0.018 * L * 2) / csEnd;
-  const du_pct_end = (du_v_end / U_kurs) * 100;
-
-  let krav1ok, krav2ok, storKabel;
-  if (isNaring) {
-    storKabel = true;
-    krav1ok   = (Ib <= In) && (In <= IzFinal);
-    krav2ok   = I2 <= IzFinal * 1.45;
-  } else {
-    storKabel = csEnd > 4;
-    krav1ok   = storKabel ? (Ib <= In && In <= IzFinal) : (Ib <= In);
-    krav2ok   = storKabel ? (I2 <= IzFinal * 1.45) : (I2 <= IzFinal);
-  }
-
-  return { Ib, In, I2, vd, kf, temp, IzTab, IzFinal, csEnd, ledere, U_kurs,
-           Zytre, rfase_end, ik2pmin_final, I5_grense,
-           sfOk: du_pct_end <= grense, krav1ok, krav2ok,
-           ikOk: ik2pmin_final * 1000 >= I5_grense, storKabel };
 }
 
-function byggKursBlokker(pfx) {
-  const isNaring = pfx === 'n';
-  const st = kursState[pfx];
-  lagre(pfx, st.aktiv);
-  const medData = st.kurs.filter(k => k.data && parseFloat(k.data.ib) > 0);
-  if (!medData.length) return [];
-
-  const computed = medData.map(k => ({ k, r: beregnKurs(k.data, isNaring) }));
-
-  const groups = new Map();
-  for (const item of computed) {
-    const key = `${item.r.csEnd}_${item.k.data.metode}_${item.k.data.verntype}_${item.r.In}`;
-    if (!groups.has(key)) groups.set(key, []);
-    groups.get(key).push(item);
-  }
-
-  return [...groups.values()].map(items => {
-    const rep = items.reduce((best, cur) =>
-      (parseFloat(cur.k.data.lengde)||0) > (parseFloat(best.k.data.lengde)||0) ? cur : best, items[0]);
-    const d = rep.k.data, r = rep.r;
-    const L = parseFloat(d.lengde) || 0;
-
-    const navn = items.map(it => it.k.navn);
-    const kursnavnliste = navn.length === 1 ? navn[0]
-      : navn.slice(0,-1).join(', ') + ' og ' + navn[navn.length-1];
-
-    const kabeltype = ['A1','B1'].includes(d.metode) ? 'PN' : 'PR';
-    const krav1tekst = (isNaring || r.storKabel)
-      ? `${_n(r.Ib,1)}A  ≤  ${r.In}A  ≤  ${_n(r.IzFinal,1)}A`
-      : `${_n(r.Ib,1)}A  ≤  ${r.In}A`;
-    const krav2tekst = (isNaring || r.storKabel)
-      ? `I₂ = ${_n(r.I2,1)}A  ≤  Iz × 1,45 = ${_n(r.IzFinal*1.45,1)}A`
-      : `I₂ = ${_n(r.I2,1)}A  ≤  Iz = ${_n(r.IzFinal,1)}A`;
-    const du_v  = (r.Ib * 0.018 * L * 2) / r.csEnd;
-    const du_pct = (du_v / r.U_kurs) * 100;
-    const rfDec = r.rfase_end < 1 ? 3 : 2;
-
-    return {
-      kursnavnliste,
-      vernkode:             `${d.verntype} ${r.In}A`,
-      metode:               d.metode,
-      antallLedere:         String(r.ledere),
-      kabelLinje:           `${kabeltype} ${r.ledere}×${r.csEnd}mm² + ${r.csEnd}mm²`,
-      omgTemp:              `${d.temp || 30}°C`,
-      kfTemp:               _n(r.kf, 2),
-      antallKurser:         String(items.length),
-      kfKurser:             '1,00',
-      izRaw:                `${_n(r.IzTab, 1)}A`,
-      izEndelig:            `${_n(r.IzFinal, 1)}A`,
-      lengde:               `${L}m`,
-      grense:               String(parseInt(d.grense) || 5),
-      krav1tekst,
-      krav1status:          r.krav1ok ? 'OK' : 'IKKE OK',
-      krav2tekst,
-      krav2status:          r.krav2ok ? 'OK' : 'IKKE OK',
-      spenningsfallFormel:  `ΔU = 2 × 0,018 × ${L}m × ${_n(r.Ib,1)}A / ${r.csEnd}mm² = ${_n(du_v,2)}V`,
-      spenningsfallProsent: `${_n(du_pct,1)}%`,
-      spenningsfallStatus:  du_pct <= (parseFloat(d.grense)||5) ? 'OK' : 'IKKE OK',
-      ik2pRfase:            `Rfase: ${_n(r.rfase_end, rfDec)} mΩ/m`,
-      ik2pU:                `${r.U_kurs}V`,
-      ik2pZytre:            `Zytre: ${r.Zytre} mΩ`,
-      ik2pFormelMedVerdier: `= (0,9 × ${r.U_kurs}) / (2 × 1,2 × (${r.Zytre}mΩ + ${_n(r.rfase_end,rfDec)}mΩ/m × ${L}m))`,
-      ik2pResultat:         `       = ${_n(r.ik2pmin_final, 3)} kA  =  ${Math.round(r.ik2pmin_final*1000)}A`,
-      ik2pI5Linje:          `I5 = In × ${r.vd.i5}   =   ${r.In}A × ${r.vd.i5} = ${Math.round(r.I5_grense)}A`,
-      ik2pAnbefaling:       `Anbefaling: Ik2pmin ≥ I5   →   ${Math.round(r.ik2pmin_final*1000)}A  ≥  ${Math.round(r.I5_grense)}A      `,
-      ik2pStatus:           r.ikOk ? 'OK' : 'IKKE OK',
-    };
-  });
-}
-
-function byggMotorRader() {
-  const P_kW   = parseFloat(document.getElementById('m-p')?.value) || 0;
-  const U      = parseFloat(document.getElementById('m-u')?.value) || 230;
-  const f      = parseFloat(document.getElementById('m-f')?.value) || 50;
-  const cosPhi = Math.min(1, Math.max(0.001, parseFloat(document.getElementById('m-cosphi')?.value) || 0.78));
-  const faser  = parseInt(document.getElementById('m-faser')?.value) || 3;
-  const I_raw  = parseFloat(document.getElementById('m-i')?.value);
-  const r = (l, v) => ({ label: l, verdi: String(v) });
-  const rader = [
-    r('P-avgitt', `${P_kW} kW`), r('Spenning', `${U} V`),
-    r('Frekvens', `${f} Hz`), r('cos φ', `${cosPhi}`), r('Faser', `${faser}`),
-  ];
-  const P_avgitt = P_kW * 1000;
-  let P_tilfort = P_avgitt;
-  if (!isNaN(I_raw) && I_raw > 0) {
-    P_tilfort = faser === 3 ? U * I_raw * Math.sqrt(3) * cosPhi : U * I_raw * cosPhi;
-    rader.push(r('Motorstrøm I', `${I_raw.toFixed(1)} A`));
-    rader.push(r('P-tilført', `${P_tilfort.toFixed(0)} W`));
-    rader.push(r('Virkningsgrad η', `${(P_tilfort>0?P_avgitt/P_tilfort*100:0).toFixed(1)}%`));
-  }
-  const phi_rad = Math.acos(cosPhi);
-  const P_fase  = P_tilfort / faser;
-  const Q_L     = P_fase * Math.tan(phi_rad);
-  const I_C     = Q_L / U;
-  const C_uF    = 1 / (2 * Math.PI * f * (U / I_C)) * 1e6;
-  const I_for   = P_fase / (U * cosPhi);
-  const I_etter = P_fase / U;
-  const deltaI  = I_for - I_etter;
-  rader.push(r('P per fase', `${P_fase.toFixed(0)} W`));
-  rader.push(r('Q_L (reaktiv induktiv)', `${Q_L.toFixed(0)} VAr`));
-  rader.push(r('Kompenserende strøm I_C', `${I_C.toFixed(2)} A`));
-  rader.push(r('Kapasitans C (per fase)', `${C_uF.toFixed(0)} μF`));
-  rader.push(r('I_før kompensering', `${I_for.toFixed(2)} A`));
-  rader.push(r('I_etter kompensering', `${I_etter.toFixed(2)} A`));
-  rader.push(r('Strømreduksjon ΔI', `${deltaI.toFixed(2)} A`));
-  rader.push(r('Relativ reduksjon Δi', `${I_for>0?(deltaI/I_for*100).toFixed(1):'0,0'}%`));
-  return rader;
-}
-
-function byggOvRader() {
-  const boligVis = document.getElementById('ov-bolig-content').style.display !== 'none';
-  const pfx = boligVis ? 'b' : 'n';
-  const rader = [];
-  document.getElementById(`ov-${pfx}-rows`)?.querySelectorAll('tr').forEach(tr => {
-    const td = tr.querySelectorAll('td');
-    if (td.length >= 2) rader.push({ label: td[0].textContent.trim(), verdi: td[1].textContent.trim() });
-  });
-  return rader;
-}
-
-function byggJordRader() {
-  const rader = [];
-  document.getElementById('j-rows-ra')?.querySelectorAll('tr').forEach(tr => {
-    const td = tr.querySelectorAll('td');
-    if (td.length >= 2) rader.push({ label: td[0].textContent.trim(), verdi: td[1].textContent.trim() });
-  });
-  document.getElementById('j-ra-metrics')?.querySelectorAll('.metric').forEach(m => {
-    const lbl = m.querySelector('.metric-label')?.textContent.trim();
-    const val = m.querySelector('.metric-value')?.textContent.trim();
-    if (lbl && val) rader.push({ label: lbl, verdi: val });
-  });
-  const rec = document.getElementById('j-recommendation-content');
-  if (rec?.textContent.trim()) rader.push({ label: 'Anbefaling', verdi: rec.textContent.trim() });
-  return rader;
-}
-
-function apneEksport() {
-  lagre('b', kursState.b.aktiv);
-  lagre('n', kursState.n.aktiv);
-  const hasB = kursState.b.kurs.some(k => k.data && parseFloat(k.data.ib) > 0);
-  const hasN = kursState.n.kurs.some(k => k.data && parseFloat(k.data.ib) > 0);
-  const hasM = (parseFloat(document.getElementById('m-p')?.value) || 0) > 0;
-  const map  = { bolig: hasB, naring: hasN, motor: hasM, ov: hasB || hasN, jord: true };
-  for (const [key, has] of Object.entries(map)) {
-    const row = document.getElementById(`exp-row-${key}`);
-    const cb  = document.getElementById(`exp-${key}`);
-    if (row) row.style.display = has ? '' : 'none';
-    if (cb)  cb.checked = has;
-  }
-  const el = id => document.getElementById(id);
-  if (el('exp-bolig-count'))  el('exp-bolig-count').textContent  = kursState.b.kurs.filter(k => k.data && parseFloat(k.data.ib)>0).length;
-  if (el('exp-naring-count')) el('exp-naring-count').textContent = kursState.n.kurs.filter(k => k.data && parseFloat(k.data.ib)>0).length;
-  document.getElementById('export-backdrop').removeAttribute('hidden');
-}
-
-function lukkEksport() {
-  document.getElementById('export-backdrop').setAttribute('hidden', '');
-}
-
-function lasteEksportLibs(cb) {
-  if (window.PizZip && window.docxtemplater) { cb(); return; }
-  const s1 = document.createElement('script');
-  s1.src = 'https://cdn.jsdelivr.net/npm/pizzip@3/dist/pizzip.min.js';
-  s1.onload = () => {
-    const s2 = document.createElement('script');
-    s2.src = 'https://cdn.jsdelivr.net/npm/docxtemplater@3/build/docxtemplater.js';
-    s2.onload = cb;
-    document.head.appendChild(s2);
-  };
-  document.head.appendChild(s1);
-}
-
-async function kjorEksport() {
-  const inclBolig  = document.getElementById('exp-bolig')?.checked;
-  const inclNaring = document.getElementById('exp-naring')?.checked;
-  const inclMotor  = document.getElementById('exp-motor')?.checked;
-  const inclOv     = document.getElementById('exp-ov')?.checked;
-  const inclJord   = document.getElementById('exp-jord')?.checked;
-  if (!inclBolig && !inclNaring && !inclMotor && !inclOv && !inclJord) {
-    alert('Velg minst én kategori.');
-    return;
-  }
-  const btn = document.getElementById('exp-lastned-btn');
-  const orig = btn.textContent;
-  btn.textContent = 'Genererer…';
+async function doLogin() {
+  const username = document.getElementById('login-user').value.trim();
+  const password = document.getElementById('login-pass').value;
+  const btn = document.getElementById('login-btn');
+  const errEl = document.getElementById('login-error');
+  if (!username || !password) { loginErr('Fyll inn brukernavn og passord'); return; }
   btn.disabled = true;
+  btn.textContent = 'Logger inn…';
+  errEl.style.display = 'none';
   try {
-    if (inclBolig)  lagre('b', kursState.b.aktiv);
-    if (inclNaring) lagre('n', kursState.n.aktiv);
-    await new Promise(resolve => lasteEksportLibs(resolve));
-    const kurser = [
-      ...(inclBolig  ? byggKursBlokker('b') : []),
-      ...(inclNaring ? byggKursBlokker('n') : []),
-    ];
-    const data = {
-      kurser,
-      harMotor: !!inclMotor, motorRader: inclMotor ? byggMotorRader() : [],
-      harOv:    !!inclOv,    ovRader:    inclOv    ? byggOvRader()    : [],
-      harJord:  !!inclJord,  jordRader:  inclJord  ? byggJordRader()  : [],
-    };
-    const resp = await fetch('./template.docx');
-    if (!resp.ok) throw new Error(`Klarte ikke laste template.docx (HTTP ${resp.status})`);
-    const buf = await resp.arrayBuffer();
-    const zip = new PizZip(buf);
-    const doc = new docxtemplater(zip, { linebreaks: true });
-    doc.render(data);
-    const blob = doc.getZip().generate({
-      type: 'blob',
-      mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    const fp = await FingerprintJS.load();
+    const { visitorId } = await fp.get();
+    const { data, error } = await _sb.rpc('check_login', {
+      p_username: username, p_password: password, p_fingerprint: visitorId
     });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url; a.download = 'Utregning.docx'; a.click();
-    URL.revokeObjectURL(url);
-    lukkEksport();
-  } catch(e) {
-    console.error('Eksport feil:', e);
-    let msg = e.message || String(e);
-    if (e.properties?.errors?.length) {
-      msg = e.properties.errors
-        .map(err => err.properties?.explanation || err.message || String(err))
-        .join('\n');
+    if (error) throw error;
+    if (data.ok) {
+      sessionStorage.setItem('auth_user', username);
+      document.getElementById('login-overlay').remove();
+    } else {
+      loginErr(data.msg);
     }
-    alert('Eksport feilet:\n' + msg);
-  } finally {
-    btn.textContent = orig;
-    btn.disabled = false;
+  } catch(e) {
+    loginErr('Tilkoblingsfeil — prøv igjen');
+    console.error(e);
   }
+  btn.disabled = false;
+  btn.textContent = 'Logg inn';
 }
+
+function loginErr(msg) {
+  const el = document.getElementById('login-error');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+// ---- END AUTH ----
 
 </script>
 
