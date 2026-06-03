@@ -382,6 +382,35 @@
   }
   .kurs-del-btn:active { transform: scale(0.97); }
 
+  .kurs-rename-btn {
+    background: transparent;
+    border: 0.5px solid var(--border-mid);
+    border-radius: var(--radius-sm);
+    padding: 4px 7px;
+    font-size: 12px;
+    color: var(--text-3);
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background 120ms var(--ease-out), color 120ms var(--ease-out), transform 100ms var(--ease-out);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .kurs-rename-btn:hover { background: var(--accent-light); color: var(--accent-text); border-color: var(--accent); }
+  }
+  .kurs-rename-btn:active { transform: scale(0.97); }
+
+  .kurs-rename-input {
+    flex: 1;
+    background: var(--surface);
+    border: 1.5px solid var(--accent);
+    border-radius: var(--radius-sm);
+    padding: 7px 10px;
+    font-size: 13px;
+    font-family: inherit;
+    color: var(--text);
+    outline: none;
+    min-width: 0;
+  }
+
   .main-content { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 16px; }
 
   .container { max-width: 100%; margin: 0; padding: 0; gap: 0; display: contents; }
@@ -1546,6 +1575,36 @@ function slettKurs(pfx, idx) {
   if(pfx === 'b') calc(); else calcNaring();
 }
 
+function renameKurs(pfx, idx, e) {
+  e.stopPropagation();
+  const list = document.getElementById(`${pfx}-kurs-list`);
+  const row = list.children[idx];
+  const nameSpan = row.querySelector('.kurs-name');
+  const currentName = kursState[pfx].kurs[idx].navn;
+
+  const inp = document.createElement('input');
+  inp.type = 'text';
+  inp.value = currentName;
+  inp.className = 'kurs-rename-input';
+  nameSpan.replaceWith(inp);
+  inp.focus();
+  inp.select();
+
+  let done = false;
+  const confirm = () => {
+    if(done) return;
+    done = true;
+    const newName = inp.value.trim() || currentName;
+    kursState[pfx].kurs[idx].navn = newName;
+    renderKursList(pfx);
+  };
+  inp.addEventListener('blur', confirm);
+  inp.addEventListener('keydown', ev => {
+    if(ev.key === 'Enter') inp.blur();
+    if(ev.key === 'Escape') { done = true; renderKursList(pfx); }
+  });
+}
+
 function renderKursList(pfx) {
   const st = kursState[pfx];
   const list = document.getElementById(`${pfx}-kurs-list`);
@@ -1553,9 +1612,10 @@ function renderKursList(pfx) {
   list.innerHTML = st.kurs.map((k, i) => `
     <div style="display:flex;gap:4px;align-items:center;">
       <button class="kurs-btn${i === st.aktiv ? ' active' : ''}" style="flex:1" onclick="byttKurs('${pfx}', ${i})">
-        <span>${k.navn}</span>
+        <span class="kurs-name">${k.navn}</span>
         <span class="kurs-status">${k.ok === true ? '✓' : k.ok === false ? '✕' : ''}</span>
       </button>
+      <button class="kurs-rename-btn" onclick="renameKurs('${pfx}', ${i}, event)" title="Gi nytt navn">✎</button>
       ${st.kurs.length > 1 ? `<button class="kurs-del-btn" onclick="slettKurs('${pfx}', ${i})" title="Slett kurs">×</button>` : ''}
     </div>
   `).join('');
