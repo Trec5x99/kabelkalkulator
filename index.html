@@ -480,7 +480,6 @@
 
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@fingerprintjs/fingerprintjs@4/dist/fp.min.js"></script>
 </head>
 <body>
 
@@ -2296,8 +2295,8 @@ async function doLogin() {
   btn.textContent = 'Logger inn…';
   errEl.style.display = 'none';
   try {
-    const fp = await FingerprintJS.load();
-    const { visitorId } = await fp.get();
+    let visitorId = localStorage.getItem('_did');
+    if (!visitorId) { visitorId = crypto.randomUUID(); localStorage.setItem('_did', visitorId); }
     const { data, error } = await _sb.rpc('check_login', {
       p_username: username, p_password: password, p_fingerprint: visitorId
     });
