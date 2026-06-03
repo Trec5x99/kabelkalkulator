@@ -1246,10 +1246,13 @@ Krav Ra × Id ≤ Uc gjelder ikke for TN — overstrømsvernet sikrer frakobling
 
   <div class="card">
     <div class="card-title"><span class="dot"></span>Kursfortegnelse — velg type installasjon</div>
-    <div class="kf-selector">
-      <button class="kurs-btn active" id="kf-btn-bolig"   onclick="visKF('bolig')">Bolig</button>
-      <button class="kurs-btn"        id="kf-btn-naring"  onclick="visKF('naring')">Næringsdrivende</button>
-      <button class="kurs-btn"        id="kf-btn-begge"   onclick="visKF('begge')">Begge</button>
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+      <div class="kf-selector">
+        <button class="kurs-btn active" id="kf-btn-bolig"   onclick="visKF('bolig')">Bolig</button>
+        <button class="kurs-btn"        id="kf-btn-naring"  onclick="visKF('naring')">Næringsdrivende</button>
+        <button class="kurs-btn"        id="kf-btn-begge"   onclick="visKF('begge')">Begge</button>
+      </div>
+      <button id="kf-export-btn" onclick="eksporterKursfort()" style="margin-left:auto;background:var(--accent);color:#fff;border:none;border-radius:var(--radius-sm);padding:8px 18px;font-size:13px;font-family:inherit;font-weight:500;cursor:pointer;transition:opacity 150ms;">Eksporter til Word</button>
     </div>
   </div>
 
@@ -2547,6 +2550,156 @@ function renderKursfort(type) {
   tbody += '</tbody>';
 
   document.getElementById('kf-table').innerHTML = `<thead>${thead}</thead>${tbody}`;
+}
+async function eksporterKursfort() {
+  const btn = document.getElementById('kf-export-btn');
+  btn.disabled = true;
+  btn.textContent = 'Laster…';
+  try {
+    if (!window.docx) {
+      await new Promise((res, rej) => {
+        const s = document.createElement('script');
+        s.src = 'https://unpkg.com/docx@8/build/index.js';
+        s.onload = res;
+        s.onerror = () => rej(new Error('Klarte ikke laste docx-bibliotek'));
+        document.head.appendChild(s);
+      });
+    }
+
+    const { Document, Packer, Table, TableRow, TableCell, Paragraph, TextRun,
+            WidthType, AlignmentType, BorderStyle, ShadingType,
+            PageOrientation, convertMillimetersToTwip } = window.docx;
+
+    lagre('b', kursState.b.aktiv);
+    lagre('n', kursState.n.aktiv);
+
+    const COL_WIDTHS = [700, 3200, 1400, 1400, 800, 1200, 1000, 1500]; // landscape A4
+
+    const brd = (color = 'AAAAAA') => ({
+      top:    { style: BorderStyle.SINGLE, size: 4, color },
+      bottom: { style: BorderStyle.SINGLE, size: 4, color },
+      left:   { style: BorderStyle.SINGLE, size: 4, color },
+      right:  { style: BorderStyle.SINGLE, size: 4, color },
+    });
+
+    const hdrCell = (text, idx) => new TableCell({
+      width: { size: COL_WIDTHS[idx], type: WidthType.DXA },
+      children: [new Paragraph({
+        children: [new TextRun({ text, bold: true, color: 'FFFFFF', size: 18 })],
+        alignment: AlignmentType.CENTER,
+      })],
+      shading: { fill: '1A3A2A', type: ShadingType.CLEAR, color: 'auto' },
+      borders: brd('FFFFFF'),
+    });
+
+    const dataCell = (text, center = false, colIdx = 0) => new TableCell({
+      width: { size: COL_WIDTHS[colIdx], type: WidthType.DXA },
+      children: [new Paragraph({
+        children: [new TextRun({ text: String(text), size: 18 })],
+        alignment: center ? AlignmentType.CENTER : AlignmentType.LEFT,
+      })],
+      borders: brd(),
+    });
+
+    const COL_NAMES = [
+      'Kursnr.', 'Kursbeskrivelse', 'Verntype', 'In [A] / Kar',
+      'Jfb [mA]', 'Ref. inst. met.', 'Lengde [m]', 'Ant. ledere og S [mm\xb2]'
+    ];
+
+    const headerRow = new TableRow({
+      children: COL_NAMES.map((n, i) => hdrCell(n, i)),
+      tableHeader: true,
+    });
+
+    function buildSectionRows(pfx, isNaring) {
+      const kurs = kursState[pfx].kurs;
+      if (!kurs.length) return [];
+      const label = isNaring ? 'Næringsdrivende' : 'Bolig';
+      const rows = [new TableRow({
+        children: [new TableCell({
+          columnSpan: 8,
+          children: [new Paragraph({
+            children: [new TextRun({ text: label, bold: true, size: 20, color: '1A3A2A' })],
+          })],
+          shading: { fill: 'E3EDE7', type: ShadingType.CLEAR, color: 'auto' },
+          borders: brd('1A3A2A'),
+        })],
+      })];
+
+      kurs.forEach((k, i) => {
+        const d = k.data || {};
+        const Ib = parseFloat(d.ib) || 0;
+        const In  = Ib ? nextSikring(Ib) : '—';
+        const cs  = Ib ? beregnCsEndForKurs(d, isNaring) : '—';
+        const [lStr] = (d.ledere || '2_230').split('_');
+        const leder = parseInt(lStr);
+        const L = parseFloat(d.lengde) || 0;
+        rows.push(new TableRow({ children: [
+          dataCell(i + 1, true, 0),
+          dataCell(k.navn, false, 1),
+          dataCell('Kombivern', false, 2),
+          dataCell(Ib ? `${In} / ${d.verntype || '—'}` : '—', true, 3),
+          dataCell(Ib ? '30' : '—', true, 4),
+          dataCell(Ib ? (d.metode || '—') : '—', true, 5),
+          dataCell(Ib ? String(L) : '—', true, 6),
+          dataCell(Ib ? `${leder}x${cs}` : '—', true, 7),
+        ]}));
+      });
+      return rows;
+    }
+
+    const allRows = [headerRow];
+    if (kfCurrentType === 'bolig'  || kfCurrentType === 'begge') allRows.push(...buildSectionRows('b', false));
+    if (kfCurrentType === 'naring' || kfCurrentType === 'begge') allRows.push(...buildSectionRows('n', true));
+
+    const table = new Table({
+      rows: allRows,
+      columnWidths: COL_WIDTHS,
+    });
+
+    const labelMap = { bolig: 'Bolig', naring: 'Næringsdrivende', begge: 'Bolig og Næringsdrivende' };
+    const doc = new Document({
+      sections: [{
+        properties: { page: {
+          size: {
+            orientation: PageOrientation.LANDSCAPE,
+            width:  convertMillimetersToTwip(297),
+            height: convertMillimetersToTwip(210),
+          },
+          margin: {
+            top: convertMillimetersToTwip(20), bottom: convertMillimetersToTwip(20),
+            left: convertMillimetersToTwip(18), right: convertMillimetersToTwip(18),
+          },
+        }},
+        children: [
+          new Paragraph({
+            children: [new TextRun({ text: `Kursfortegnelse — ${labelMap[kfCurrentType]}`, bold: true, size: 28 })],
+            spacing: { after: 200 },
+          }),
+          table,
+          new Paragraph({
+            children: [new TextRun({ text: 'Beregnet iht. NEK 400:2022 — Krav 1, Krav 2, spenningsfall og Ik2pmin. Jfb = jordfeilbryter (HPFI/RCD) 30 mA.', size: 16, color: '888888' })],
+            spacing: { before: 120 },
+          }),
+        ],
+      }],
+    });
+
+    const blob = await Packer.toBlob(doc);
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'kursfortegnelse.docx';
+    a.click();
+    URL.revokeObjectURL(url);
+
+  } catch (err) {
+    console.error(err);
+    alert('Eksport feilet: ' + err.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Eksporter til Word';
+  }
 }
 // ---- END KURSFORTEGNELSE ----
 
