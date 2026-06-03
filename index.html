@@ -437,6 +437,26 @@
     line-height: 1.7;
   }
 
+  /* ---- KURSFORTEGNELSE ---- */
+  .kf-wrap { max-width: 1000px; margin: 0 auto; padding: 2rem 1.5rem; display: flex; flex-direction: column; gap: 16px; }
+  .kf-selector { display: flex; gap: 6px; flex-wrap: wrap; }
+  .kf-title { font-size: 16px; font-weight: 700; letter-spacing: -0.01em; margin-bottom: 12px; color: var(--text); }
+
+  .kf-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .kf-table th, .kf-table td { border: 1px solid var(--border-strong); padding: 7px 10px; vertical-align: middle; }
+  .kf-table thead th { background: var(--accent); color: #fff; font-size: 11px; font-weight: 600; letter-spacing: 0.04em; text-align: center; }
+  .kf-table thead th.kf-group { background: var(--accent-mid); text-align: center; }
+  .kf-table thead th.kf-left { text-align: left; }
+  .kf-table tbody tr:nth-child(even):not(.kf-section-row) td { background: var(--surface2); }
+  .kf-table .kf-section-row td { background: var(--accent-light); color: var(--accent-text); font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; padding: 7px 10px; }
+  .kf-table td.num { text-align: center; }
+
+  @media print {
+    header, nav, .kf-selector, .card-title { display: none !important; }
+    .kf-wrap { padding: 0; }
+    .kf-table th, .kf-table td { font-size: 11px; padding: 5px 7px; }
+  }
+
   /* ---- LOGIN ---- */
   #login-overlay {
     position: fixed;
@@ -548,6 +568,7 @@
     <button onclick="visside('motor', this)">Motor</button>
     <button onclick="visside('ov', this)">Overbelastning</button>
     <button onclick="visside('jording', this)">Jording</button>
+    <button onclick="visside('kursfort', this)">Kursfortegnelse</button>
   </nav>
 </header>
 
@@ -1220,6 +1241,29 @@ Krav Ra × Id ≤ Uc gjelder ikke for TN — overstrømsvernet sikrer frakobling
 </footer>
 </div>
 
+<div id="side-kursfort" style="display:none;">
+<div class="kf-wrap">
+
+  <div class="card">
+    <div class="card-title"><span class="dot"></span>Kursfortegnelse — velg type installasjon</div>
+    <div class="kf-selector">
+      <button class="kurs-btn active" id="kf-btn-bolig"   onclick="visKF('bolig')">Bolig</button>
+      <button class="kurs-btn"        id="kf-btn-naring"  onclick="visKF('naring')">Næringsdrivende</button>
+      <button class="kurs-btn"        id="kf-btn-begge"   onclick="visKF('begge')">Begge</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="kf-title" id="kf-heading">Kursfortegnelse</div>
+    <div style="overflow-x:auto;">
+      <table class="kf-table" id="kf-table"></table>
+    </div>
+    <p class="ref-note" style="margin-top:14px;">Tverrsnitt beregnet iht. NEK 400:2022 — Krav 1, Krav 2, spenningsfall og Ik2pmin. Jfb = jordfeilbryter (HPFI/RCD) 30 mA.</p>
+  </div>
+
+</div>
+</div>
+
 <script>
 // Tabell 5.6b — Zytre (mΩ/fase) per spenning og Ik i fordeling
 const ZYTRE = {
@@ -1628,7 +1672,7 @@ function oppdaterKursStatus(pfx, ok) {
 }
 
 function visside(side, knapp) {
-  ['bolig','naring','motor','ov','jording'].forEach(s => {
+  ['bolig','naring','motor','ov','jording','kursfort'].forEach(s => {
     document.getElementById('side-'+s).style.display = side === s ? '' : 'none';
   });
   document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
@@ -1637,6 +1681,7 @@ function visside(side, knapp) {
   if(side === 'motor') calcMotor();
   if(side === 'ov') calcOV();
   if(side === 'jording') calcJording();
+  if(side === 'kursfort') renderKursfort(kfCurrentType);
 }
 
 function visOvSide(side) {
@@ -2381,6 +2426,129 @@ function loginErr(msg) {
   el.style.display = 'block';
 }
 // ---- END AUTH ----
+
+// ---- KURSFORTEGNELSE ----
+let kfCurrentType = 'bolig';
+
+function visKF(type) {
+  kfCurrentType = type;
+  ['bolig','naring','begge'].forEach(t => {
+    document.getElementById('kf-btn-'+t).classList.toggle('active', t === type);
+  });
+  renderKursfort(type);
+}
+
+function beregnCsEndForKurs(d, isNaring) {
+  const metode = d.metode || 'B1';
+  const [lStr, uStr] = (d.ledere || '2_230').split('_');
+  const ledere = parseInt(lStr);
+  const U_kurs = parseInt(uStr);
+  const Ib = parseFloat(d.ib) || 0;
+  const verntype = d.verntype || 'C';
+  const grense = parseFloat(d.grense) || 5;
+  const L = parseFloat(d.lengde) || 0;
+  const netttype = d.netttype || 'TN';
+  const temp = parseInt(d.temp) || 30;
+  const kf = KF_PVC[temp] ?? 1.00;
+  const ik_spenning = netttype === 'IT' ? 230 : 400;
+
+  const In = nextSikring(Ib);
+  const i2f = I2F[verntype] || 1.45;
+  const I2 = i2f * In;
+  const vd = VERN_DATA[verntype] || VERN_DATA.C;
+
+  const cs2 = isNaring
+    ? findMinCs(metode, ledere, I2 / (i2f * kf))
+    : findMinCs(metode, ledere, I2 / kf);
+
+  const RHO_SF = 0.018;
+  const cs2idx = SIZES.indexOf(cs2 || 1.5);
+  let csSF = null;
+  for (let i = cs2idx; i < SIZES.length; i++) {
+    const s = SIZES[i];
+    if ((Ib * RHO_SF * L * 2) / s / U_kurs * 100 <= grense) { csSF = s; break; }
+  }
+  if (!csSF) csSF = 120;
+
+  const ik_fordeling = parseFloat(d.ik_fordeling) || 1;
+  const Zytre_val = ZYTRE[ik_spenning]?.[ik_fordeling] ?? 86;
+  let csIk = 120;
+  for (const s of SIZES) {
+    const ik = (0.9 * U_kurs) / (2 * 1.2 * (Zytre_val + RHO[s] * L));
+    if (ik * 1000 >= vd.i5 * In) { csIk = s; break; }
+  }
+
+  const idxs = [
+    SIZES.indexOf(findMinCs(metode, ledere, In / kf) || 1.5),
+    SIZES.indexOf(cs2 || 1.5),
+    SIZES.indexOf(csSF),
+    SIZES.indexOf(csIk)
+  ];
+  if (isNaring) idxs.push(SIZES.indexOf(csNasjTilpasning(metode, In)));
+  return SIZES[Math.max(...idxs)];
+}
+
+function renderKursfort(type) {
+  lagre('b', kursState.b.aktiv);
+  lagre('n', kursState.n.aktiv);
+
+  const labelMap = { bolig: 'Bolig', naring: 'Næringsdrivende', begge: 'Bolig og Næringsdrivende' };
+  document.getElementById('kf-heading').textContent = 'Kursfortegnelse — ' + labelMap[type];
+
+  const thead = `<tr>
+    <th class="kf-left" rowspan="2">Kursnr.</th>
+    <th class="kf-left" rowspan="2">Kursbeskrivelse</th>
+    <th class="kf-group" colspan="3">Vern</th>
+    <th class="kf-group" colspan="3">Kabel</th>
+  </tr>
+  <tr>
+    <th>Verntype</th>
+    <th>In [A] / Kar</th>
+    <th>Jfb [mA]</th>
+    <th>Ref. inst. met.</th>
+    <th>Lengde [m]</th>
+    <th>Ant. ledere og S [mm²]</th>
+  </tr>`;
+
+  function buildSection(pfx, isNaring) {
+    const kurs = kursState[pfx].kurs;
+    if (!kurs.length) return '';
+    const sectionLabel = isNaring ? 'Næringsdrivende' : 'Bolig';
+    const rows = kurs.map((k, i) => {
+      const d = k.data || {};
+      const Ib = parseFloat(d.ib) || 0;
+      if (!Ib) return `<tr>
+        <td class="num">${i+1}</td>
+        <td>${k.navn}</td>
+        <td colspan="6" style="color:var(--text-3);font-style:italic;">—</td>
+      </tr>`;
+      const In = nextSikring(Ib);
+      const cs = beregnCsEndForKurs(d, isNaring);
+      const [lStr] = (d.ledere || '2_230').split('_');
+      const leder = parseInt(lStr);
+      const L = parseFloat(d.lengde) || 0;
+      return `<tr>
+        <td class="num">${i+1}</td>
+        <td>${k.navn}</td>
+        <td>Kombivern</td>
+        <td class="num">${In} / ${d.verntype || '—'}</td>
+        <td class="num">30</td>
+        <td class="num">${d.metode || '—'}</td>
+        <td class="num">${L}</td>
+        <td class="num">${leder}x${cs}</td>
+      </tr>`;
+    }).join('');
+    return `<tr class="kf-section-row"><td colspan="8">${sectionLabel}</td></tr>${rows}`;
+  }
+
+  let tbody = '<tbody>';
+  if (type === 'bolig' || type === 'begge') tbody += buildSection('b', false);
+  if (type === 'naring' || type === 'begge') tbody += buildSection('n', true);
+  tbody += '</tbody>';
+
+  document.getElementById('kf-table').innerHTML = `<thead>${thead}</thead>${tbody}`;
+}
+// ---- END KURSFORTEGNELSE ----
 
 </script>
 
