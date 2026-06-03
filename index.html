@@ -3067,7 +3067,7 @@ async function eksporterUtregning() {
     if (!window.docxtemplater) {
       await new Promise((res, rej) => {
         const s = document.createElement('script');
-        s.src = 'https://cdn.jsdelivr.net/npm/docxtemplater@3.47.2/build/docxtemplater.umd.js';
+        s.src = 'https://cdn.jsdelivr.net/npm/docxtemplater@3.47.2/build/docxtemplater.js';
         s.onload = res;
         s.onerror = () => rej(new Error('Klarte ikke laste Docxtemplater'));
         document.head.appendChild(s);
