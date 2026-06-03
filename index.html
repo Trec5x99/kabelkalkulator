@@ -527,6 +527,53 @@
   #login-btn:disabled { opacity: 0.6; cursor: not-allowed; }
   /* ---- END LOGIN ---- */
 
+  /* ---- EKSPORT MODAL ---- */
+  #eksport-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: rgba(0,0,0,0.45);
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+  }
+  #eksport-modal.open { display: flex; }
+  .eksport-card {
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    width: 100%;
+    max-width: 320px;
+    box-shadow: var(--shadow-lg);
+  }
+  .eksport-title {
+    font-size: 15px; font-weight: 600; color: var(--text);
+    margin-bottom: 1rem;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .eksport-close {
+    background: none; border: none; cursor: pointer;
+    color: var(--text-3); font-size: 20px; line-height: 1;
+    padding: 2px 6px; border-radius: 6px;
+  }
+  .eksport-close:hover { background: var(--surface2); }
+  .eksport-checkboxes { display: flex; flex-direction: column; gap: 9px; margin-bottom: 1.25rem; }
+  .eksport-check {
+    display: flex; align-items: center; gap: 10px;
+    cursor: pointer; font-size: 14px; color: var(--text); user-select: none;
+  }
+  .eksport-check input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--accent); cursor: pointer; }
+  .eksport-run-btn {
+    width: 100%; background: var(--accent); color: #fff; border: none;
+    border-radius: var(--radius-sm); padding: 10px;
+    font-size: 14px; font-weight: 600; font-family: inherit;
+    cursor: pointer; transition: background 150ms var(--ease-out);
+  }
+  .eksport-run-btn:hover { background: var(--accent-mid); }
+  .eksport-run-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+  /* ---- END EKSPORT MODAL ---- */
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 </head>
@@ -554,13 +601,31 @@
   </div>
 </div>
 
+<div id="eksport-modal">
+  <div class="eksport-card">
+    <div class="eksport-title">
+      <span>Eksporter utregning</span>
+      <button class="eksport-close" onclick="lukkEksportModal()">×</button>
+    </div>
+    <div class="eksport-checkboxes">
+      <label class="eksport-check"><input type="checkbox" id="exp-bolig" checked> Bolig</label>
+      <label class="eksport-check"><input type="checkbox" id="exp-naring" checked> Næringsdrivende</label>
+      <label class="eksport-check"><input type="checkbox" id="exp-motor"> Motor</label>
+      <label class="eksport-check"><input type="checkbox" id="exp-ov"> Overbelastning</label>
+      <label class="eksport-check"><input type="checkbox" id="exp-jord"> Jording</label>
+    </div>
+    <button class="eksport-run-btn" id="eksport-run-btn" onclick="eksporterUtregning()">Eksporter til Word</button>
+  </div>
+</div>
+
 <header>
   <div class="header-top">
     <div class="logo">⚡</div>
-    <div>
+    <div style="flex:1">
       <h1>NEK 400 Kabelkalkulator</h1>
       <p>Krav 1 · Krav 2 · Spenningsfall · Motor — NEK 400:2022</p>
     </div>
+    <button onclick="visEksportModal()" style="background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.22);color:#fff;border-radius:var(--radius-sm);padding:7px 15px;font-size:13px;font-family:inherit;font-weight:500;cursor:pointer;white-space:nowrap;transition:background 150ms var(--ease-out);" onmouseover="this.style.background='rgba(255,255,255,0.2)'" onmouseout="this.style.background='rgba(255,255,255,0.12)'">Eksporter</button>
   </div>
   <nav>
     <button class="active" onclick="visside('bolig', this)">Bolig</button>
@@ -2702,6 +2767,346 @@ async function eksporterKursfort() {
   }
 }
 // ---- END KURSFORTEGNELSE ----
+
+// ==================== UTREGNING EKSPORT ====================
+
+function visEksportModal() { document.getElementById('eksport-modal').classList.add('open'); }
+function lukkEksportModal() { document.getElementById('eksport-modal').classList.remove('open'); }
+
+function beregnKurs(d, isNaring) {
+  const fmtNO = (v, dec = 1) => v.toFixed(dec).replace('.', ',');
+
+  const metode      = d.metode || 'B1';
+  const [lStr, uStr] = (d.ledere || '2_230').split('_');
+  const ledere      = parseInt(lStr);
+  const U_kurs      = parseInt(uStr);
+  const Ib          = parseFloat(d.ib) || 0;
+  const verntype    = d.verntype || 'C';
+  const grense      = parseFloat(d.grense) || 5;
+  const L           = parseFloat(d.lengde) || 0;
+  const netttype    = d.netttype || 'TN';
+  const temp        = parseInt(d.temp) || 30;
+  const kf          = KF_PVC[temp] ?? 1.00;
+  const ik_spenning = netttype === 'IT' ? 230 : 400;
+  const ik_fordeling = parseFloat(d.ik_fordeling) || 1;
+
+  const In  = nextSikring(Ib);
+  const i2f = I2F[verntype] || 1.45;
+  const I2  = i2f * In;
+  const vd  = VERN_DATA[verntype] || VERN_DATA.C;
+
+  const cs2 = isNaring
+    ? findMinCs(metode, ledere, I2 / (i2f * kf))
+    : findMinCs(metode, ledere, I2 / kf);
+
+  const RHO_SF = 0.018;
+  const cs2idx = SIZES.indexOf(cs2 || 1.5);
+  let csSF = 120, du_v_sf = 0, du_pct_sf = 0;
+  for (let i = cs2idx; i < SIZES.length; i++) {
+    const s = SIZES[i];
+    const dv = (Ib * RHO_SF * L * 2) / s;
+    const dp = (dv / U_kurs) * 100;
+    if (dp <= grense) { csSF = s; du_v_sf = dv; du_pct_sf = dp; break; }
+  }
+  if (csSF === 120) { du_v_sf = (Ib*RHO_SF*L*2)/120; du_pct_sf = (du_v_sf/U_kurs)*100; }
+
+  const Zytre     = ZYTRE[ik_spenning]?.[ik_fordeling] ?? 86;
+  const I5        = vd.i5;
+  const I5_grense = I5 * In;
+  let csIk = 120;
+  for (const s of SIZES) {
+    const ik = (0.9 * U_kurs) / (2 * 1.2 * (Zytre + RHO[s] * L));
+    if (ik * 1000 >= I5_grense) { csIk = s; break; }
+  }
+
+  const idxs = [
+    SIZES.indexOf(findMinCs(metode, ledere, In / kf) || 1.5),
+    SIZES.indexOf(cs2 || 1.5),
+    SIZES.indexOf(csSF),
+    SIZES.indexOf(csIk)
+  ];
+  if (isNaring) idxs.push(SIZES.indexOf(csNasjTilpasning(metode, In)));
+  const idxFinal = Math.max(...idxs);
+  const csEnd    = SIZES[idxFinal];
+
+  const IzTab      = IZ[metode]?.[ledere]?.[csEnd] || 0;
+  const IzFinal    = IzTab * kf;
+  const rfaseEnd   = RHO[csEnd];
+  const denom_end  = 2 * 1.2 * (Zytre + rfaseEnd * L);
+  const ik2pFinal  = (0.9 * U_kurs) / denom_end;
+  const du_v_end   = (Ib * RHO_SF * L * 2) / csEnd;
+  const du_pct_end = (du_v_end / U_kurs) * 100;
+
+  const storKabel  = !isNaring && csEnd > 4;
+  const krav1ok    = isNaring ? (Ib <= In && In <= IzFinal) : (storKabel ? (Ib <= In && In <= IzFinal) : (Ib <= In));
+  const krav2grense = (isNaring || storKabel) ? IzFinal * 1.45 : IzFinal;
+  const krav2ok    = I2 <= krav2grense;
+  const ikOk       = ik2pFinal * 1000 >= I5_grense;
+  const sfOk       = du_pct_end <= grense;
+
+  const kabelPfx   = ['A1','B1'].includes(metode) ? 'PN' : 'PR';
+  const peSzMap    = {1.5:1.5,2.5:2.5,4:4,6:6,10:10,16:16,25:16,35:16,50:25,70:35,95:50,120:70};
+  const peSz       = peSzMap[csEnd] || csEnd;
+
+  const krav1tekst = (isNaring || storKabel)
+    ? `Ib ${fmtNO(Ib)}A  ≤  In ${In}A  ≤  Iz ${fmtNO(IzFinal)}A`
+    : `Ib ${fmtNO(Ib)}A  ≤  In ${In}A`;
+  const krav2tekst = (isNaring || storKabel)
+    ? `I₂ = ${fmtNO(I2,2)}A  ≤  Iz × 1,45 = ${fmtNO(krav2grense,2)}A`
+    : `I₂ = ${fmtNO(I2,2)}A  ≤  Iz = ${fmtNO(IzFinal,1)}A`;
+
+  return {
+    vernkode:             `${verntype}${In}A`,
+    metode,
+    antallLedere:         String(ledere),
+    lengde:               `${L}m`,
+    grense:               String(grense),
+    ik2pU:                `${U_kurs}V`,
+    omgTemp:              `${temp}°C`,
+    antallKurser:         '1',
+    kfTemp:               fmtNO(kf, 2),
+    kfKurser:             '1,00',
+    izRaw:                `${fmtNO(IzTab)}A`,
+    izEndelig:            `${fmtNO(IzFinal)}A`,
+    krav1tekst,
+    krav1status:          krav1ok ? '✓ Oppfylt' : '✕ Ikke oppfylt',
+    krav2tekst,
+    krav2status:          krav2ok ? '✓ Oppfylt' : '✕ Ikke oppfylt',
+    spenningsfallFormel:  `2 × 0,018 × ${L}m × ${fmtNO(Ib)}A / ${csEnd}mm² = ${fmtNO(du_v_end,3)}V`,
+    spenningsfallProsent: `= ${fmtNO(du_v_end,3)}V × 100 / ${U_kurs}V = ${fmtNO(du_pct_end,2)}%`,
+    spenningsfallStatus:  sfOk ? `< ${grense}%  ✓` : `> ${grense}%  ✕`,
+    ik2pRfase:            fmtNO(rfaseEnd, 2),
+    ik2pZytre:            String(Zytre),
+    ik2pFormelMedVerdier: `= (0,9 × ${U_kurs}) / (2 × 1,2 × (${Zytre}mΩ + ${fmtNO(rfaseEnd,2)}mΩ/m × ${L}m))`,
+    ik2pResultat:         `= ${ik2pFinal.toFixed(3).replace('.',',')} kA  =  ${fmtNO(ik2pFinal*1000,0)} A`,
+    ik2pI5Linje:          `I5 = In × ${I5}   =   ${In}A × ${I5} = ${fmtNO(I5_grense,0)}A`,
+    ik2pAnbefaling:       `Ik2pmin = ${fmtNO(ik2pFinal*1000,0)} A  ${ikOk?'≥':'<'}  I5×In = ${fmtNO(I5_grense,0)} A`,
+    ik2pStatus:           ikOk ? '✓ Oppfylt' : '✕ Ikke oppfylt',
+    kabelLinje:           `${kabelPfx} ${ledere}×${csEnd}mm² + ${peSz}mm²`,
+  };
+}
+
+function grupperKurserForEksport(kurser, isNaring) {
+  const groups = new Map();
+  kurser.forEach(k => {
+    const d = k.data;
+    if (!d || !(parseFloat(d.ib) > 0)) return;
+    const csEnd = beregnCsEndForKurs(d, isNaring);
+    const In    = nextSikring(parseFloat(d.ib));
+    const key   = `${csEnd}_${d.verntype}_${In}_${d.metode}`;
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push({ k, d, L: parseFloat(d.lengde) || 0 });
+  });
+  const result = [];
+  for (const members of groups.values()) {
+    members.sort((a, b) => b.L - a.L);
+    const rep = members[0];
+    result.push({ data: rep.d, navn: members.map(m => m.k.navn) });
+  }
+  return result;
+}
+
+function getMotorRader() {
+  const fmtNO = (v, d=1) => v.toFixed(d).replace('.', ',');
+  const P_kW  = parseFloat(document.getElementById('m-p').value) || 0;
+  const U     = parseFloat(document.getElementById('m-u').value) || 230;
+  const f     = parseFloat(document.getElementById('m-f').value) || 50;
+  const cosPhi = Math.min(1, Math.max(0.001, parseFloat(document.getElementById('m-cosphi').value) || 0.78));
+  const faser  = parseInt(document.getElementById('m-faser').value) || 3;
+  const I_raw  = parseFloat(document.getElementById('m-i').value);
+  const hasI   = !isNaN(I_raw) && I_raw > 0;
+  const sqrt3  = Math.sqrt(3);
+  const phi_deg = Math.acos(cosPhi) * 180 / Math.PI;
+  const P_tilfort = hasI ? (faser===3 ? U*I_raw*sqrt3*cosPhi : U*I_raw*cosPhi) : P_kW*1000;
+  const tanPhi = Math.tan(Math.acos(cosPhi));
+  const P_fase = P_tilfort / faser;
+  const Q_L   = P_fase * tanPhi;
+  const I_C   = Q_L / U;
+  const C_uF  = 1 / (2 * Math.PI * f * (U / I_C)) * 1e6;
+  const rader = [
+    { label: 'Motoreffekt P-avgitt', verdi: `${fmtNO(P_kW,2)} kW` },
+    { label: `Spenning U (${faser}-fase)`, verdi: `${U} V` },
+    { label: 'Effektfaktor cos φ', verdi: `${cosPhi}  (φ ≈ ${fmtNO(phi_deg,1)}°)` },
+  ];
+  if (hasI) {
+    rader.push({ label: 'Målt motorstrøm I', verdi: `${fmtNO(I_raw,1)} A` });
+    const eta = P_tilfort > 0 ? P_kW*1000/P_tilfort : 0;
+    rader.push({ label: 'Virkningsgrad η', verdi: `${fmtNO(eta*100,1)}%` });
+  }
+  rader.push(
+    { label: 'Tilført effekt P-tilført', verdi: `${fmtNO(P_tilfort/1000,2)} kW` },
+    { label: 'Reaktiv effekt Q_L', verdi: `${fmtNO(Q_L,0)} VAr` },
+    { label: 'Nødvendig kapasitans C (per fase)', verdi: `${fmtNO(C_uF,0)} µF` }
+  );
+  return rader;
+}
+
+function getOvRader(pfx) {
+  const fmtNO = (v, d=2) => v.toFixed(d).replace('.', ',');
+  const erBolig = pfx === 'b';
+  const kurser  = kursState[pfx].kurs;
+  const antall  = kurser.length;
+  const sf      = sfFaktor(antall, erBolig);
+  const netttype = document.getElementById(`ov-${pfx}-netttype`)?.value || 'TN';
+  const metodOV  = document.getElementById(`ov-${pfx}-metode`)?.value  || 'C';
+  const U    = netttype === 'IT' ? 230 : 400;
+  const sqrt3 = Math.sqrt(3);
+  const margin = (parseFloat(document.getElementById(`ov-${pfx}-margin`)?.value) || 20) / 100;
+  const i2_ov  = parseFloat(document.getElementById(`ov-${pfx}-i2`)?.value) || 1.45;
+  let ptot = 0;
+  kurser.forEach(k => {
+    const d = k.data || {};
+    const Ib = parseFloat(d.ib) || 0;
+    const [lStr, uStr] = (d.ledere || '2_230').split('_');
+    ptot += parseInt(lStr)===3 ? sqrt3*parseInt(uStr)*Ib : parseInt(uStr)*Ib;
+  });
+  const OV_A      = (ptot * sf) / (sqrt3 * U);
+  const OV_margin = OV_A * (1 + margin);
+  const In_ov     = nextSikring(OV_margin);
+  const I2_ov     = i2_ov * In_ov;
+  const csInntak  = findMinCs(metodOV, 3, Math.max(OV_margin, I2_ov)) || 120;
+  const IzInntak  = IZ[metodOV]?.[3]?.[csInntak] || 0;
+  return [
+    { label: `${erBolig?'Bolig':'Næring'} — antall kurser`, verdi: String(antall) },
+    { label: 'Samtidighetsfaktor Sf', verdi: String(sf) },
+    { label: 'Total installert effekt Ptot', verdi: `${Math.round(ptot)} W` },
+    { label: `OV = (Ptot × Sf) / (√3 × ${U} V)`, verdi: `${fmtNO(OV_A)} A` },
+    { label: `Med ${Math.round(margin*100)}% margin`, verdi: `${fmtNO(OV_margin)} A` },
+    { label: 'Valgt OV-vern In', verdi: `${In_ov} A` },
+    { label: `Inntakskabel metode ${metodOV}`, verdi: `${csInntak} mm²  (Iz = ${IzInntak} A)` },
+  ];
+}
+
+function getJordRader() {
+  const fmtNO = (v, d=2) => v.toFixed(d).replace('.', ',');
+  const netttype = document.getElementById('j-netttype').value;
+  if (netttype === 'TN') return [{ label: 'Netttype', verdi: 'TN-nett — Ra × Id ≤ Uc ikke aktuelt' }];
+  const kabeltype   = document.getElementById('j-kabeltype').value;
+  const trafokva    = parseFloat(document.getElementById('j-trafo').value) || 0;
+  const jfbStr      = parseFloat(document.getElementById('j-jfb').value) || 0;
+  const forhandsJfb = document.querySelector('input[name="j-forhands"]:checked')?.value || 'nei';
+  const forhandsStr = parseFloat(document.getElementById('j-forhands-storrelse').value) || 0;
+  let Id_mA = 0, Id_kilde = '—';
+  if (kabeltype === '1') {
+    if (forhandsJfb === 'ja' && forhandsStr > 0) { Id_mA = forhandsStr; Id_kilde = `Forhånds JFB ${forhandsStr} mA`; }
+    else if (trafokva > 0) { Id_mA = 2 * trafokva; Id_kilde = `2 mA/kVA × ${trafokva} kVA`; }
+  } else if (jfbStr > 0) {
+    Id_mA = jfbStr; Id_kilde = `JFB ${jfbStr} mA`;
+  }
+  if (!Id_mA) return [{ label: 'IT-jording', verdi: 'Fyll inn nødvendige verdier' }];
+  const Id_A    = Id_mA / 1000;
+  const faktor  = parseFloat(document.getElementById('j-faktor').value) || 10;
+  const Ra_50   = 50 / Id_A;
+  const Uc_eff  = 50 / faktor;
+  const Ra_krav = Uc_eff / Id_A;
+  return [
+    { label: 'Netttype', verdi: 'IT-nett' },
+    { label: 'Jordfeilstrøm Id', verdi: `${Id_mA} mA` },
+    { label: 'Kilde', verdi: Id_kilde },
+    { label: 'Ra maks — Uc = 50 V', verdi: `${fmtNO(Ra_50)} Ω` },
+    { label: `Ra maks — ${faktor}× faktor  (Uc = ${Uc_eff.toFixed(1)} V)`, verdi: `${fmtNO(Ra_krav)} Ω` },
+  ];
+}
+
+async function eksporterUtregning() {
+  const btn = document.getElementById('eksport-run-btn');
+  btn.disabled = true;
+  btn.textContent = 'Laster…';
+  try {
+    lagre('b', kursState.b.aktiv);
+    lagre('n', kursState.n.aktiv);
+
+    const inkBolig  = document.getElementById('exp-bolig').checked;
+    const inkNaring = document.getElementById('exp-naring').checked;
+    const inkMotor  = document.getElementById('exp-motor').checked;
+    const inkOv     = document.getElementById('exp-ov').checked;
+    const inkJord   = document.getElementById('exp-jord').checked;
+
+    const kurser = [];
+    if (inkBolig) {
+      grupperKurserForEksport(kursState.b.kurs, false).forEach(g => {
+        kurser.push({ ...beregnKurs(g.data, false), kursnavnliste: g.navn.join(', ') });
+      });
+    }
+    if (inkNaring) {
+      grupperKurserForEksport(kursState.n.kurs, true).forEach(g => {
+        kurser.push({ ...beregnKurs(g.data, true), kursnavnliste: g.navn.join(', ') });
+      });
+    }
+
+    const motorRader = inkMotor ? getMotorRader() : [];
+    const ovRadB     = inkOv   ? getOvRader('b') : [];
+    const ovRadN     = inkOv   ? getOvRader('n') : [];
+    const ovRader    = [...ovRadB, ...ovRadN];
+    const jordRader  = inkJord  ? getJordRader() : [];
+
+    if (kurser.length === 0 && !inkMotor && !inkOv && !inkJord) {
+      alert('Ingen kurs å eksportere — legg til kurser eller velg seksjoner.');
+      return;
+    }
+
+    const data = {
+      kurser,
+      harMotor:   inkMotor && motorRader.length > 0,
+      motorRader,
+      harOv:      inkOv    && ovRader.length > 0,
+      ovRader,
+      harJord:    inkJord  && jordRader.length > 0,
+      jordRader,
+    };
+
+    if (!window.PizZip) {
+      await new Promise((res, rej) => {
+        const s = document.createElement('script');
+        s.src = 'https://cdn.jsdelivr.net/npm/pizzip@3.1.7/dist/pizzip.umd.js';
+        s.onload = res;
+        s.onerror = () => rej(new Error('Klarte ikke laste PizZip'));
+        document.head.appendChild(s);
+      });
+    }
+    if (!window.docxtemplater) {
+      await new Promise((res, rej) => {
+        const s = document.createElement('script');
+        s.src = 'https://cdn.jsdelivr.net/npm/docxtemplater@3.47.2/build/docxtemplater.umd.js';
+        s.onload = res;
+        s.onerror = () => rej(new Error('Klarte ikke laste Docxtemplater'));
+        document.head.appendChild(s);
+      });
+    }
+
+    btn.textContent = 'Henter mal…';
+    const resp = await fetch('./template.docx');
+    if (!resp.ok) throw new Error(`Klarte ikke hente template.docx (HTTP ${resp.status})`);
+    const arrayBuf = await resp.arrayBuffer();
+
+    btn.textContent = 'Genererer…';
+    const Docxtemplater = window.docxtemplater;
+    const zip = new window.PizZip(arrayBuf);
+    const doc = new Docxtemplater(zip, { paragraphLoop: true, linebreaks: true });
+    doc.render(data);
+
+    const out = doc.getZip().generate({
+      type: 'blob',
+      mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+    });
+    const url = URL.createObjectURL(out);
+    const a   = document.createElement('a');
+    a.href    = url;
+    a.download = 'utregning.docx';
+    a.click();
+    URL.revokeObjectURL(url);
+    lukkEksportModal();
+
+  } catch (err) {
+    console.error(err);
+    const msg = err.properties?.errors?.map(e=>e.message).join('\n') || err.message;
+    alert('Eksport feilet:\n' + msg);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Eksporter til Word';
+  }
+}
+// ==================== END UTREGNING EKSPORT ====================
 
 </script>
 
