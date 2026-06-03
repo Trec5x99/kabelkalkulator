@@ -3058,7 +3058,7 @@ async function eksporterUtregning() {
     if (!window.PizZip) {
       await new Promise((res, rej) => {
         const s = document.createElement('script');
-        s.src = 'https://cdn.jsdelivr.net/npm/pizzip@3.1.7/dist/pizzip.umd.js';
+        s.src = 'https://cdn.jsdelivr.net/npm/pizzip@3.1.7/dist/pizzip.js';
         s.onload = res;
         s.onerror = () => rej(new Error('Klarte ikke laste PizZip'));
         document.head.appendChild(s);
