@@ -2559,7 +2559,7 @@ async function eksporterKursfort() {
     if (!window.docx) {
       await new Promise((res, rej) => {
         const s = document.createElement('script');
-        s.src = 'https://unpkg.com/docx@8/build/index.js';
+        s.src = 'https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.js';
         s.onload = res;
         s.onerror = () => rej(new Error('Klarte ikke laste docx-bibliotek'));
         document.head.appendChild(s);
