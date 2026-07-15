@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<title>husdetaljering.no · Admin</title>
+<meta name="robots" content="noindex, nofollow" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet" />
+<script src="cleanly-data.js"></script>
+<style>
+  body { margin: 0; }
+  a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px solid #2B87C8; outline-offset: 2px; }
+</style>
+</helmet>
+
+<div style="font-family:'Nunito Sans',system-ui,-apple-system,sans-serif;color:#123047;background:#F2FAFE;min-height:100vh;">
+
+  <!-- ============ LOGIN ============ -->
+  <sc-if value="{{ notAuthed }}" hint-placeholder-val="{{ true }}">
+    <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:22px;">
+      <form onSubmit="{{ onLogin }}" style="width:100%;max-width:380px;background:#fff;border:2px solid #CFEBFB;border-radius:24px;padding:36px 30px;box-shadow:0 18px 40px rgba(43,135,200,.14);">
+        <img src="Logo og navn.png" alt="husdetaljering.no" style="height:38px;display:block;margin:0 auto 6px;" />
+        <p style="text-align:center;font-family:'Baloo 2',sans-serif;font-weight:700;font-size:19px;margin:8px 0 22px;color:#123047;">Innlogging for eier</p>
+        <label for="email" style="display:block;font-weight:700;font-size:14px;margin-bottom:6px;">E-post</label>
+        <input id="email" type="email" value="{{ email }}" onInput="{{ onEmailInput }}" autoComplete="email" style="width:100%;padding:14px 16px;border:2px solid #CFEBFB;border-radius:12px;font-family:inherit;font-size:17px;color:#123047;background:#fff;box-sizing:border-box;margin-bottom:14px;" style-focus="border-color:#2B87C8;" />
+        <label for="pass" style="display:block;font-weight:700;font-size:14px;margin-bottom:6px;">Passord</label>
+        <input id="pass" type="password" value="{{ pass }}" onInput="{{ onPassInput }}" autoComplete="current-password" style="width:100%;padding:14px 16px;border:2px solid #CFEBFB;border-radius:12px;font-family:inherit;font-size:17px;color:#123047;background:#fff;box-sizing:border-box;" style-focus="border-color:#2B87C8;" />
+        <sc-if value="{{ hasError }}" hint-placeholder-val="{{ false }}">
+          <p style="color:#c0392b;font-weight:700;font-size:14px;margin:10px 0 0;">Feil e-post eller passord. Prøv igjen.</p>
+        </sc-if>
+        <button type="submit" disabled="{{ loginLoading }}" style="width:100%;margin-top:18px;background:#2B87C8;color:#fff;font-family:'Baloo 2',sans-serif;font-weight:700;font-size:18px;padding:14px;border-radius:999px;border:none;cursor:pointer;box-shadow:0 8px 20px rgba(43,135,200,.28);" style-hover="background:#216a9e;">{{ loginLoading ? 'Logger inn…' : 'Logg inn' }}</button>
+      </form>
+    </div>
+  </sc-if>
+
+  <!-- ============ DASHBOARD ============ -->
+  <sc-if value="{{ authed }}" hint-placeholder-val="{{ false }}">
+    <div>
+      <!-- topbar -->
+      <header style="position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid #E4F3FC;">
+        <div style="max-width:1240px;margin:0 auto;padding:14px 22px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;">
+          <div style="display:flex;align-items:center;gap:12px;">
+            <img src="Logo og navn.png" alt="husdetaljering.no" style="height:32px;display:block;" />
+            <span style="font-family:'Baloo 2',sans-serif;font-weight:700;font-size:18px;color:#3f6580;">Admin</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <button onClick="{{ exportCsv }}" style="background:#F2FAFE;border:2px solid #CFEBFB;color:#123047;font-family:'Baloo 2',sans-serif;font-weight:700;font-size:14px;padding:9px 16px;border-radius:999px;cursor:pointer;" style-hover="border-color:#2B87C8;">Last ned CSV</button>
+            <a href="Cleanly.dc.html" style="text-decoration:none;background:#F2FAFE;border:2px solid #CFEBFB;color:#123047;font-family:'Baloo 2',sans-serif;font-weight:700;font-size:14px;padding:9px 16px;border-radius:999px;" style-hover="border-color:#2B87C8;">Se nettsiden</a>
+            <button onClick="{{ onLogout }}" style="background:#2B87C8;border:none;color:#fff;font-family:'Baloo 2',sans-serif;font-weight:700;font-size:14px;padding:9px 16px;border-radius:999px;cursor:pointer;" style-hover="background:#216a9e;">Logg ut</button>
+          </div>
+        </div>
+      </header>
+
+      <div style="max-width:1240px;margin:0 auto;padding:26px 22px 60px;">
+
+        <sc-if value="{{ hasDemo }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;background:#FFF6E9;border:2px solid #F5DDB4;border-radius:14px;padding:12px 16px;margin-bottom:22px;">
+            <span style="font-weight:700;font-size:14px;color:#8a5a12;">Viser demodata slik at du ser hvordan dashbordet fungerer. Ekte henvendelser fra skjemaet legger seg øverst.</span>
+            <button onClick="{{ onClearDemo }}" style="background:#fff;border:2px solid #F5DDB4;color:#8a5a12;font-family:'Baloo 2',sans-serif;font-weight:700;font-size:13px;padding:8px 14px;border-radius:999px;cursor:pointer;white-space:nowrap;">Tøm demodata</button>
+          </div>
+        </sc-if>
+
+        <!-- VIEW TABS -->
+        <div style="display:flex;gap:6px;margin-bottom:22px;background:#fff;border:2px solid #CFEBFB;border-radius:999px;padding:5px;width:fit-content;">
+          <button onClick="{{ showListe }}" style="{{ tabListeStyle }}">Henvendelser</button>
+          <button onClick="{{ showTimeplan }}" style="{{ tabTimeplanStyle }}">Timeplan</button>
+        </div>
+
+        <!-- ============ OVERSIKT / HENVENDELSER ============ -->
+        <sc-if value="{{ isListe }}" hint-placeholder-val="{{ true }}">
+        <div>
+        <!-- STAT CARDS -->
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:22px;">
+          <div style="background:#2B87C8;border-radius:18px;padding:20px 22px;color:#fff;box-shadow:0 10px 24px rgba(43,135,200,.22);">
+            <div style="font-size:14px;font-weight:700;opacity:.9;">Nye henvendelser</div>
+            <div style="font-family:'Baloo 2',sans-serif;font-weight:800;font-size:40px;line-height:1.1;">{{ stats.nye }}</div>
+            <div style="font-size:13px;opacity:.9;">venter på svar</div>
+          </div>
+          <div style="background:#fff;border:2px solid #CFEBFB;border-radius:18px;padding:20px 22px;">
+            <div style="font-size:14px;font-weight:700;color:#6a8598;">Siste 7 dager</div>
+            <div style="font-family:'Baloo 2',sans-serif;font-weight:800;font-size:40px;line-height:1.1;color:#123047;">{{ stats.week }}</div>
+            <div style="font-size:13px;color:#6a8598;">henvendelser inn</div>
+          </div>
+          <div style="background:#fff;border:2px solid #CFEBFB;border-radius:18px;padding:20px 22px;">
+            <div style="font-size:14px;font-weight:700;color:#6a8598;">Siste 30 dager</div>
+            <div style="font-family:'Baloo 2',sans-serif;font-weight:800;font-size:40px;line-height:1.1;color:#123047;">{{ stats.month }}</div>
+            <div style="font-size:13px;color:#6a8598;">henvendelser inn</div>
+          </div>
+          <div style="background:#fff;border:2px solid #CFEBFB;border-radius:18px;padding:20px 22px;">
+            <div style="font-size:14px;font-weight:700;color:#6a8598;">Totalt</div>
+            <div style="font-family:'Baloo 2',sans-serif;font-weight:800;font-size:40px;line-height:1.1;color:#123047;">{{ stats.total }}</div>
+            <div style="font-size:13px;color:#6a8598;">gjennom tidene</div>
+          </div>
+          <div style="background:#fff;border:2px solid #CFEBFB;border-radius:18px;padding:20px 22px;">
+            <div style="font-size:14px;font-weight:700;color:#6a8598;">Fullført-andel</div>
+            <div style="font-family:'Baloo 2',sans-serif;font-weight:800;font-size:40px;line-height:1.1;color:#2F9E5B;">{{ stats.winRate }}%</div>
+            <div style="font-size:13px;color:#6a8598;">av avgjorte jobber</div>
+          </div>
+        </div>
+
+        <!-- CHARTS -->
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px;margin-bottom:26px;">
+          <!-- weekly volume -->
+          <div style="background:#fff;border:2px solid #CFEBFB;border-radius:18px;padding:22px;">
+            <div style="font-family:'Baloo 2',sans-serif;font-weight:700;font-size:18px;margin-bottom:18px;">Henvendelser per uke</div>
+            <div style="display:flex;align-items:flex-end;gap:12px;height:150px;">
+              <sc-for list="{{ stats.weeks }}" as="w" hint-placeholder-count="6">
+                <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:8px;height:100%;justify-content:flex-end;">
+                  <div style="font-family:'Baloo 2',sans-serif;font-weight:700;font-size:14px;color:#123047;">{{ w.count }}</div>
+                  <div style="width:100%;max-width:42px;background:#2B87C8;border-radius:8px 8px 0 0;min-height:4px;height:{{ w.pct }}%;"></div>
+                  <div style="font-size:12px;color:#8095a3;font-weight:700;">{{ w.label }}</div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+          <!-- per service -->
+          <div style="background:#fff;border:2px solid #CFEBFB;border-radius:18px;padding:22px;">
+            <div style="font-family:'Baloo 2',sans-serif;font-weight:700;font-size:18px;margin-bottom:18px;">Fordeling på tjeneste</div>
+            <div style="display:flex;flex-direction:column;gap:12px;">
+              <sc-for list="{{ stats.perService }}" as="row" hint-placeholder-count="5">
+                <div style="display:flex;align-items:center;gap:12px;">
+                  <div style="width:88px;font-size:14px;font-weight:700;color:#3f6580;flex-shrink:0;">{{ row.label }}</div>
+                  <div style="flex:1;background:#F2FAFE;border-radius:999px;height:16px;overflow:hidden;">
+                    <div style="height:100%;border-radius:999px;min-width:6px;width:{{ row.pct }}%;background:{{ row.color }};"></div>
+                  </div>
+                  <div style="width:26px;text-align:right;font-family:'Baloo 2',sans-serif;font-weight:700;font-size:15px;">{{ row.count }}</div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+
+        <!-- STATUS PILLS + FILTERS -->
+        <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:16px;">
+          <sc-for list="{{ statusFilters }}" as="f" hint-placeholder-count="6">
+            <button onClick="{{ f.onClick }}" style="{{ f.style }}">{{ f.label }}</button>
+          </sc-for>
+          <div style="flex:1;"></div>
+          <input type="search" value="{{ q }}" onInput="{{ onSearch }}" placeholder="Søk navn, adresse, telefon…" style="min-width:220px;padding:11px 15px;border:2px solid #CFEBFB;border-radius:12px;font-family:inherit;font-size:15px;color:#123047;background:#fff;box-sizing:border-box;" style-focus="border-color:#2B87C8;" />
+        </div>
+
+        <!-- LIST + DETAIL -->
+        <div style="display:grid;grid-template-columns:{{ gridCols }};gap:16px;align-items:start;">
+          <!-- list -->
+          <div style="background:#fff;border:2px solid #CFEBFB;border-radius:18px;overflow:hidden;">
+            <sc-if value="{{ hasRows }}" hint-placeholder-val="{{ true }}">
+              <div>
+                <sc-for list="{{ rows }}" as="r" hint-placeholder-count="6">
+                  <button onClick="{{ r.onClick }}" style="{{ r.rowStyle }}">
+                    <div style="display:flex;align-items:center;gap:10px;min-width:0;">
+                      <span style="width:10px;height:10px;border-radius:50%;flex-shrink:0;background:{{ r.statusColor }};"></span>
+                      <div style="min-width:0;">
+                        <div style="font-family:'Baloo 2',sans-serif;font-weight:700;font-size:16px;color:#123047;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ r.name }}</div>
+                        <div style="font-size:13px;color:#6a8598;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ r.serviceLabel }} · {{ r.adresse }}</div>
+                      </div>
+                    </div>
+                    <div style="text-align:right;flex-shrink:0;">
+                      <div style="font-size:12px;font-weight:700;color:{{ r.statusColor }};">{{ r.statusLabel }}</div>
+                      <div style="font-size:12px;color:#8095a3;">{{ r.dateStr }}</div>
+                    </div>
+                  </button>
+                </sc-for>
+              </div>
+            </sc-if>
+            <sc-if value="{{ noRows }}" hint-placeholder-val="{{ false }}">
+              <div style="padding:40px 22px;text-align:center;color:#6a8598;font-weight:700;">Ingen henvendelser her ennå.</div>
+            </sc-if>
+          </div>
+
+          <!-- detail -->
+          <sc-if value="{{ hasSelected }}" hint-placeholder-val="{{ false }}">
+            <div style="background:#fff;border:2px solid #CFEBFB;border-radius:18px;padding:24px;position:sticky;top:86px;">
+              <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:6px;">
+                <div style="font-family:'Baloo 2',sans-serif;font-weight:800;font-size:24px;color:#123047;">{{ sel.name }}</div>
+                <button onClick="{{ clearSelection }}" aria-label="Lukk" style="background:none;border:none;font-size:22px;line-height:1;color:#8095a3;cursor:pointer;padding:2px 6px;">×</button>
+              </div>
+              <div style="font-size:14px;color:#6a8598;margin-bottom:18px;">{{ sel.serviceLabel }} · mottatt {{ sel.dateStr }}</div>
+
+              <div style="display:flex;flex-direction:column;gap:2px;margin-bottom:18px;">
+                <sc-for list="{{ sel.detailRows }}" as="d" hint-placeholder-count="6">
+                  <div style="display:flex;justify-content:space-between;gap:16px;padding:9px 0;border-bottom:1px solid #F0F8FD;">
+                    <span style="font-weight:700;color:#123047;font-size:14px;flex-shrink:0;">{{ d.label }}</span>
+                    <span style="color:#3f6580;text-align:right;font-size:14px;word-break:break-word;">{{ d.value }}</span>
+                  </div>
+                </sc-for>
+              </div>
+
+              <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
+                <a href="{{ sel.telHref }}" style="flex:1;min-width:120px;text-align:center;text-decoration:none;background:#2B87C8;color:#fff;font-family:'Baloo 2',sans-serif;font-weight:700;font-size:15px;padding:12px;border-radius:12px;" style-hover="background:#216a9e;">Ring</a>
+                <a href="{{ sel.mailHref }}" style="flex:1;min-width:120px;text-align:center;text-decoration:none;background:#F2FAFE;border:2px solid #CFEBFB;color:#123047;font-family:'Baloo 2',sans-serif;font-weight:700;font-size:15px;padding:10px;border-radius:12px;" style-hover="border-color:#2B87C8;">Send e-post</a>
+              </div>
+
+              <!-- PRIS -->
+              <div style="background:#FFF6E9;border:2px solid #F5DDB4;border-radius:14px;padding:16px;margin-bottom:16px;">
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;">
+                  <div style="font-family:'Baloo 2',sans-serif;font-weight:800;font-size:16px;color:#8a5a12;">Pris til kunde</div>
+                  <sc-if value="{{ sel.hasPris }}" hint-placeholder-val="{{ false }}">
+                    <span style="font-family:'Baloo 2',sans-serif;font-weight:800;font-size:20px;color:#8a5a12;">{{ sel.prisLabel }}</span>
+                  </sc-if>
+                </div>
+                <div style="font-size:13px;color:#a07526;margin-bottom:12px;">Skriv inn prisen du oppgir på telefon. Vises kun her – ikke for kunden.</div>
+                <div style="display:flex;gap:8px;align-items:stretch;">
+                  <div style="flex:1;position:relative;">
+                    <input type="number" inputmode="numeric" min="0" step="50" value="{{ formPris }}" onInput="{{ onFormPris }}" placeholder="0" style="width:100%;padding:12px 44px 12px 14px;border:2px solid #F0DBAF;border-radius:12px;font-family:inherit;font-size:16px;color:#123047;background:#fff;box-sizing:border-box;" style-focus="border-color:#E0912F;" />
+                    <span style="position:absolute;right:14px;top:50%;transform:translateY(-50%);font-weight:700;font-size:15px;color:#a07526;pointer-events:none;">kr</span>
+                  </div>
+                  <button onClick="{{ onSavePris }}" style="background:#E0912F;color:#fff;font-family:'Baloo 2',sans-serif;font-weight:700;font-size:15px;padding:12px 20px;border-radius:12px;border:none;cursor:pointer;white-space:nowrap;" style-hover="background:#c67c1f;">Lagre pris</button>
+                </div>
+              </div>
+
+              <!-- PLANLEGGING -->
+              <div style="background:#F2FAFE;border:2px solid #CFEBFB;border-radius:14px;padding:16px;margin-bottom:16px;">
+                <div style="font-family:'Baloo 2',sans-serif;font-weight:800;font-size:16px;margin-bottom:12px;">Planlegg oppdrag</div>
+
+                <sc-if value="{{ sel.isScheduled }}" hint-placeholder-val="{{ false }}">
+                  <div>
+                    <div style="display:flex;align-items:center;gap:11px;background:#fff;border:2px solid #BFE7CF;border-radius:12px;padding:12px 14px;margin-bottom:12px;">
+                      <span style="width:11px;height:11px;border-radius:50%;background:#2F9E5B;flex-shrink:0;"></span>
+                      <div>
+                        <div style="font-family:'Baloo 2',sans-serif;font-weight:800;font-size:15px;color:#123047;text-transform:capitalize;">{{ sel.schedDayLabel }}</div>
+                        <div style="font-size:13px;color:#3f6580;font-weight:700;">{{ sel.schedTimeLabel }}</div>
+                      </div>
+                    </div>
+                    <div style="display:flex;gap:8px;">
+                      <button onClick="{{ startReschedule }}" style="flex:1;background:#fff;border:2px solid #CFEBFB;color:#123047;font-family:'Baloo 2',sans-serif;font-weight:700;font-size:14px;padding:10px;border-radius:12px;cursor:pointer;" style-hover="border-color:#2B87C8;">Endre tid</button>
+                      <button onClick="{{ onUnschedule }}" style="flex:1;background:none;border:2px solid #f0d0cc;color:#c0392b;font-family:'Baloo 2',sans-serif;font-weight:700;font-size:14px;padding:10px;border-radius:12px;cursor:pointer;" style-hover="background:#fdf0ee;">Fjern</button>
+                    </div>
+                  </div>
+                </sc-if>
+
+                <sc-if value="{{ sel.showSchedForm }}" hint-placeholder-val="{{ true }}">
+                  <div>
+                    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px;">
+                      <div style="flex:1;min-width:140px;">
+                        <label for="schedDate" style="display:block;font-weight:700;font-size:13px;margin-bottom:5px;color:#3f6580;">Dato</label>
+                        <input id="schedDate" type="date" value="{{ formDate }}" onInput="{{ onFormDate }}" style="width:100%;padding:11px 12px;border:2px solid #CFEBFB;border-radius:12px;font-family:inherit;font-size:15px;color:#123047;background:#fff;box-sizing:border-box;" style-focus="border-color:#2B87C8;" />
+                      </div>
+                      <div style="width:120px;">
+                        <label for="schedTime" style="display:block;font-weight:700;font-size:13px;margin-bottom:5px;color:#3f6580;">Kl.</label>
+                        <input id="schedTime" type="time" value="{{ formTime }}" onInput="{{ onFormTime }}" style="width:100%;padding:11px 12px;border:2px solid #CFEBFB;border-radius:12px;font-family:inherit;font-size:15px;color:#123047;background:#fff;box-sizing:border-box;" style-focus="border-color:#2B87C8;" />
+                      </div>
+                    </div>
+                    <label for="schedDur" style="display:block;font-weight:700;font-size:13px;margin-bottom:5px;color:#3f6580;">Varighet</label>
+                    <select id="schedDur" value="{{ formDur }}" onChange="{{ onFormDur }}" style="width:100%;padding:11px 12px;border:2px solid #CFEBFB;border-radius:12px;font-family:inherit;font-size:15px;color:#123047;background:#fff;box-sizing:border-box;margin-bottom:14px;" style-focus="border-color:#2B87C8;">
+                      <option value="60">1 time</option>
+                      <option value="120">2 timer</option>
+                      <option value="180">3 timer</option>
+                      <option value="240">4 timer</option>
+                      <option value="480">Hel dag</option>
+                    </select>
+                    <button onClick="{{ onSchedule }}" style="width:100%;background:#2F9E5B;color:#fff;font-family:'Baloo 2',sans-serif;font-weight:700;font-size:16px;padding:13px;border-radius:12px;border:none;cursor:pointer;box-shadow:0 8px 18px rgba(47,158,91,.26);" style-hover="background:#278049;">Legg i timeplan og godkjenn</button>
+                  </div>
+                </sc-if>
+              </div>
+
+              <label for="status" style="display:block;font-weight:700;font-size:14px;margin-bottom:6px;">Status</label>
+              <select id="status" value="{{ sel.status }}" onChange="{{ onStatusChange }}" style="width:100%;padding:12px 14px;border:2px solid #CFEBFB;border-radius:12px;font-family:inherit;font-size:16px;color:#123047;background:#fff;box-sizing:border-box;margin-bottom:16px;" style-focus="border-color:#2B87C8;">
+                <option value="ny">Ny</option>
+                <option value="kontaktet">Kontaktet</option>
+                <option value="avtalt">Avtalt</option>
+                <option value="ferdig">Ferdig</option>
+                <option value="avvist">Avvist</option>
+              </select>
+
+              <button onClick="{{ onDelete }}" style="width:100%;background:none;border:2px solid #f0d0cc;color:#c0392b;font-family:'Baloo 2',sans-serif;font-weight:700;font-size:14px;padding:11px;border-radius:12px;cursor:pointer;" style-hover="background:#fdf0ee;">Slett henvendelse</button>
+            </div>
+          </sc-if>
+        </div>
+        </div>
+        </sc-if>
+
+        <!-- ============ TIMEPLAN ============ -->
+        <sc-if value="{{ isTimeplan }}" hint-placeholder-val="{{ false }}">
+          <div style="display:grid;grid-template-columns:minmax(0,2.3fr) minmax(0,1fr);gap:16px;align-items:start;">
+            <div>
+              <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap;">
+                <button onClick="{{ prevWeek }}" aria-label="Forrige uke" style="width:40px;height:40px;background:#fff;border:2px solid #CFEBFB;border-radius:12px;color:#123047;font-size:20px;font-weight:800;cursor:pointer;line-height:1;" style-hover="border-color:#2B87C8;">‹</button>
+                <button onClick="{{ nextWeek }}" aria-label="Neste uke" style="width:40px;height:40px;background:#fff;border:2px solid #CFEBFB;border-radius:12px;color:#123047;font-size:20px;font-weight:800;cursor:pointer;line-height:1;" style-hover="border-color:#2B87C8;">›</button>
+                <button onClick="{{ thisWeek }}" style="background:#F2FAFE;border:2px solid #CFEBFB;color:#123047;font-family:'Baloo 2',sans-serif;font-weight:700;font-size:14px;padding:9px 16px;border-radius:12px;cursor:pointer;" style-hover="border-color:#2B87C8;">Denne uken</button>
+                <div style="font-family:'Baloo 2',sans-serif;font-weight:800;font-size:20px;color:#123047;text-transform:capitalize;margin-left:4px;">{{ weekLabel }}</div>
+                <div style="flex:1;"></div>
+                <div style="background:#EAF5FC;color:#216a9e;font-family:'Baloo 2',sans-serif;font-weight:700;font-size:13px;padding:8px 14px;border-radius:999px;">{{ weekJobCount }} oppdrag</div>
+              </div>
+              <div style="overflow-x:auto;padding-bottom:4px;">
+                <div style="display:grid;grid-template-columns:repeat(7,minmax(148px,1fr));gap:10px;min-width:780px;">
+                  <sc-for list="{{ weekDays }}" as="day" hint-placeholder-count="7">
+                    <div style="{{ day.colStyle }}">
+                      <div style="{{ day.headStyle }}">
+                        <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;opacity:.85;">{{ day.weekday }}</div>
+                        <div style="font-family:'Baloo 2',sans-serif;font-weight:800;font-size:20px;line-height:1.1;">{{ day.dayNum }}</div>
+                      </div>
+                      <div style="display:flex;flex-direction:column;gap:8px;padding:10px;min-height:90px;">
+                        <sc-for list="{{ day.jobs }}" as="j" hint-placeholder-count="0">
+                          <button onClick="{{ j.onClick }}" style="{{ j.style }}">
+                            <div style="font-family:'Baloo 2',sans-serif;font-weight:800;font-size:13px;color:#123047;">{{ j.timeStr }}</div>
+                            <div style="font-weight:700;font-size:13px;color:#123047;line-height:1.25;">{{ j.name }}</div>
+                            <div style="font-size:12px;color:#6a8598;">{{ j.serviceLabel }}</div>
+                          </button>
+                        </sc-for>
+                        <sc-if value="{{ day.empty }}" hint-placeholder-val="{{ false }}">
+                          <div style="color:#c3d5e0;font-size:20px;font-weight:800;text-align:center;padding:6px 0;">·</div>
+                        </sc-if>
+                      </div>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </div>
+
+            <div style="background:#fff;border:2px solid #CFEBFB;border-radius:18px;padding:20px;position:sticky;top:86px;">
+              <div style="font-family:'Baloo 2',sans-serif;font-weight:800;font-size:18px;margin-bottom:4px;color:#123047;">Venter på planlegging</div>
+              <div style="font-size:13px;color:#6a8598;margin-bottom:16px;">Henvendelser uten fast tid. Klikk for å legge i timeplanen.</div>
+              <sc-if value="{{ hasWaiting }}" hint-placeholder-val="{{ true }}">
+                <div style="display:flex;flex-direction:column;gap:8px;">
+                  <sc-for list="{{ waiting }}" as="w" hint-placeholder-count="3">
+                    <button onClick="{{ w.onClick }}" style="display:block;width:100%;text-align:left;background:#F2FAFE;border:2px solid #E4F3FC;border-radius:12px;padding:12px 14px;cursor:pointer;" style-hover="border-color:#2B87C8;">
+                      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+                        <span style="display:flex;align-items:center;gap:8px;min-width:0;"><span style="width:9px;height:9px;border-radius:50%;flex-shrink:0;background:{{ w.statusColor }};"></span><span style="font-family:'Baloo 2',sans-serif;font-weight:700;font-size:15px;color:#123047;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ w.name }}</span></span>
+                        <span style="font-size:12px;color:#8095a3;flex-shrink:0;">{{ w.dateStr }}</span>
+                      </div>
+                      <div style="font-size:13px;color:#6a8598;margin-top:3px;">{{ w.serviceLabel }} · {{ w.adresse }}</div>
+                    </button>
+                  </sc-for>
+                </div>
+              </sc-if>
+              <sc-if value="{{ noWaiting }}" hint-placeholder-val="{{ false }}">
+                <div style="color:#2F9E5B;font-family:'Baloo 2',sans-serif;font-weight:700;font-size:15px;text-align:center;padding:18px 0;">Alt er planlagt!</div>
+              </sc-if>
+            </div>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { authed: false, email: '', pass: '', error: false, loginLoading: false,
+            enquiries: [], stats: null, hasDemo: false,
+            filterStatus: 'alle', q: '', selectedId: null,
+            view: 'liste', weekStart: null, reschedule: false,
+            formDate: '', formTime: '09:00', formDur: 120, formPris: '' };
+
+  componentDidMount() {
+    const session = window.CleanlyData ? window.CleanlyData.getSession() : null;
+    if (window.CleanlyData) { try { window.CleanlyData.seedDemoIfEmpty(); } catch (e) {} }
+    this.setState({ authed: !!session });
+    if (session) { this.reload(); }
+  }
+
+  async reload() {
+    if (!window.CleanlyData) { return; }
+    const list = await window.CleanlyData.getEnquiries();
+    const stats = window.CleanlyData.computeStats(list);
+    this.setState({ enquiries: list, stats: stats, hasDemo: list.some(e => e.demo) });
+  }
+
+  async onLogin(e) {
+    e.preventDefault();
+    this.setState({ loginLoading: true, error: false });
+    const result = await window.CleanlyData.signIn(this.state.email, this.state.pass);
+    if (result.ok) {
+      this.setState({ authed: true, error: false, pass: '', loginLoading: false });
+      this.reload();
+    } else {
+      this.setState({ error: true, loginLoading: false });
+    }
+  }
+  async onLogout() {
+    await window.CleanlyData.signOut();
+    this.setState({ authed: false, selectedId: null });
+  }
+
+  async changeStatus(id, status) { await window.CleanlyData.updateStatus(id, status); await this.reload(); }
+
+  weekStartOf(dt) {
+    var x = new Date(dt); x.setHours(0, 0, 0, 0);
+    var day = (x.getDay() + 6) % 7;
+    x.setDate(x.getDate() - day);
+    return x;
+  }
+  ymd(d) { return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2); }
+  hm(d) { return ('0' + d.getHours()).slice(-2) + ':' + ('0' + d.getMinutes()).slice(-2); }
+
+  selectEnquiry(e, switchView) {
+    var dt = e.scheduledAt ? new Date(e.scheduledAt) : null;
+    var patch = {
+      selectedId: e.id, reschedule: false,
+      formDate: dt ? this.ymd(dt) : '',
+      formTime: dt ? this.hm(dt) : '09:00',
+      formDur: e.durationMin || 120,
+      formPris: (e.pris != null ? String(e.pris) : '')
+    };
+    if (switchView) { patch.view = 'liste'; }
+    this.setState(patch);
+  }
+
+  async schedule() {
+    var s = this.state;
+    if (!s.formDate) { window.alert('Velg en dato først.'); return; }
+    var iso = new Date(s.formDate + 'T' + (s.formTime || '09:00') + ':00').toISOString();
+    await window.CleanlyData.scheduleEnquiry(s.selectedId, iso, Number(s.formDur));
+    this.setState({ reschedule: false });
+    await this.reload();
+  }
+  async unschedule(id) {
+    await window.CleanlyData.unscheduleEnquiry(id);
+    this.setState({ reschedule: false });
+    await this.reload();
+  }
+  async savePris() {
+    var v = this.state.formPris;
+    var pris = v === '' ? null : Number(v);
+    await window.CleanlyData.setPris(this.state.selectedId, pris);
+    await this.reload();
+  }
+  shiftWeek(delta) {
+    var base = this.state.weekStart != null ? new Date(this.state.weekStart) : this.weekStartOf(new Date());
+    this.setState({ weekStart: base.getTime() + delta * 7 * 86400000 });
+  }
+  async del(id) {
+    if (!window.confirm('Slette denne henvendelsen?')) { return; }
+    await window.CleanlyData.deleteEnquiry(id);
+    this.setState({ selectedId: null });
+    await this.reload();
+  }
+  async clearDemo() { window.CleanlyData.clearAll(); this.setState({ selectedId: null }); await this.reload(); }
+
+  dateStr(iso) {
+    const d = new Date(iso), now = new Date();
+    const dayMs = 86400000;
+    const startToday = new Date(now); startToday.setHours(0, 0, 0, 0);
+    const diff = Math.floor((startToday - new Date(d).setHours(0, 0, 0, 0)) / dayMs);
+    const hm = ('0' + d.getHours()).slice(-2) + ':' + ('0' + d.getMinutes()).slice(-2);
+    if (diff <= 0) { return 'i dag ' + hm; }
+    if (diff === 1) { return 'i går ' + hm; }
+    if (diff < 7) { return diff + ' dager siden'; }
+    return ('0' + d.getDate()).slice(-2) + '.' + ('0' + (d.getMonth() + 1)).slice(-2) + '.' + d.getFullYear();
+  }
+
+  detailRowsFor(e) {
+    const rows = [];
+    const d = e.details || {};
+    if (e.service === 'vindusvask') {
+      if (d.antallVinduer) { rows.push({ label: 'Antall vinduer', value: d.antallVinduer }); }
+      rows.push({ label: 'Vinduskarmer', value: d.karmer ? 'Ja (gratis)' : 'Nei' });
+      if (d.type) { rows.push({ label: 'Type', value: d.type }); }
+    } else if (e.service === 'maling') {
+      if (d.hva) { rows.push({ label: 'Skal males', value: d.hva }); }
+      if (d.areal) { rows.push({ label: 'Areal', value: d.areal + ' m²' }); }
+      if (d.budsjett) { rows.push({ label: 'Budsjett', value: d.budsjett === 'Vet ikke' ? 'Vet ikke' : d.budsjett + ' kr' }); }
+    } else if (e.service === 'garasje') {
+      if (d.beskrivelse) { rows.push({ label: 'Skal fjernes', value: d.beskrivelse }); }
+      rows.push({ label: 'Noe skal rives', value: d.rives ? 'Ja' : 'Nei' });
+    } else if (d.beskrivelse) {
+      rows.push({ label: 'Beskrivelse', value: d.beskrivelse });
+    }
+    rows.push({ label: 'Mobil', value: e.mobil });
+    rows.push({ label: 'E-post', value: e.epost });
+    rows.push({ label: 'Adresse', value: e.adresse });
+    if (e.melding) { rows.push({ label: 'Melding', value: e.melding }); }
+    if (e.hasImage) { rows.push({ label: 'Bilde', value: 'Lastet opp (i database)' }); }
+    return rows;
+  }
+
+  exportCsv() {
+    const list = this.state.enquiries || [];
+    const cols = ['Dato', 'Status', 'Tjeneste', 'Fornavn', 'Etternavn', 'Mobil', 'E-post', 'Adresse', 'Pris', 'Melding'];
+    const esc = v => '"' + ((v == null ? '' : '' + v).replace(/"/g, '""')) + '"';
+    const lines = [cols.join(',')];
+    list.forEach(e => {
+      lines.push([new Date(e.createdAt).toLocaleString('nb-NO'), e.status, e.serviceLabel, e.fornavn, e.etternavn, e.mobil, e.epost, e.adresse, (e.pris != null ? e.pris : ''), e.melding].map(esc).join(','));
+    });
+    const blob = new Blob(['\ufeff' + lines.join('\n')], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'cleanly-henvendelser.csv';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
+  renderVals() {
+    const SM = (window.CleanlyData && window.CleanlyData.STATUS_META) || {};
+    const stats = this.state.stats || { nye: 0, week: 0, month: 0, total: 0, winRate: 0, weeks: [], perService: [], byStatus: [] };
+    const list = this.state.enquiries || [];
+    const q = this.state.q.trim().toLowerCase();
+
+    const filtered = list.filter(e => {
+      if (this.state.filterStatus !== 'alle' && e.status !== this.state.filterStatus) { return false; }
+      if (q) {
+        const hay = (e.fornavn + ' ' + e.etternavn + ' ' + e.adresse + ' ' + e.mobil + ' ' + e.epost).toLowerCase();
+        if (hay.indexOf(q) === -1) { return false; }
+      }
+      return true;
+    });
+
+    const rows = filtered.map(e => {
+      const meta = SM[e.status] || { label: e.status, color: '#8095a3' };
+      const selected = e.id === this.state.selectedId;
+      return {
+        id: e.id,
+        name: (e.fornavn + ' ' + e.etternavn).trim() || 'Uten navn',
+        serviceLabel: e.serviceLabel,
+        adresse: e.adresse || '—',
+        statusLabel: meta.label,
+        statusColor: meta.color,
+        dateStr: this.dateStr(e.createdAt),
+        onClick: () => this.selectEnquiry(e),
+        rowStyle: 'width:100%;text-align:left;border:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;border-bottom:1px solid #F0F8FD;background:' + (selected ? '#EAF5FC' : '#fff') + ';'
+      };
+    });
+
+    const statusKeys = ['alle'].concat((window.CleanlyData && window.CleanlyData.STATUS_ORDER) || []);
+    const statusFilters = statusKeys.map(k => {
+      const active = this.state.filterStatus === k;
+      const label = k === 'alle' ? 'Alle' : (SM[k] ? SM[k].label : k);
+      return {
+        key: k, label: label,
+        onClick: () => this.setState({ filterStatus: k }),
+        style: 'border:2px solid ' + (active ? '#2B87C8' : '#CFEBFB') + ';background:' + (active ? '#2B87C8' : '#fff') + ';color:' + (active ? '#fff' : '#3f6580') + ';font-family:\'Baloo 2\',sans-serif;font-weight:700;font-size:14px;padding:8px 16px;border-radius:999px;cursor:pointer;'
+      };
+    });
+
+    const selE = list.find(e => e.id === this.state.selectedId);
+    let sel = null;
+    if (selE) {
+      const meta = SM[selE.status] || { label: selE.status, color: '#8095a3' };
+      const WDF = ['mandag', 'tirsdag', 'onsdag', 'torsdag', 'fredag', 'lørdag', 'søndag'];
+      const MON = ['januar', 'februar', 'mars', 'april', 'mai', 'juni', 'juli', 'august', 'september', 'oktober', 'november', 'desember'];
+      const scheduled = !!selE.scheduledAt;
+      let schedDayLabel = '', schedTimeLabel = '';
+      if (scheduled) {
+        const s = new Date(selE.scheduledAt);
+        const en = new Date(s.getTime() + (selE.durationMin || 120) * 60000);
+        schedDayLabel = WDF[(s.getDay() + 6) % 7] + ' ' + s.getDate() + '. ' + MON[s.getMonth()];
+        schedTimeLabel = this.hm(s) + '\u2013' + this.hm(en);
+      }
+      sel = {
+        name: (selE.fornavn + ' ' + selE.etternavn).trim() || 'Uten navn',
+        serviceLabel: selE.serviceLabel,
+        status: selE.status,
+        statusLabel: meta.label,
+        dateStr: this.dateStr(selE.createdAt),
+        detailRows: this.detailRowsFor(selE),
+        telHref: 'tel:' + (selE.mobil || '').replace(/\s/g, ''),
+        mailHref: 'mailto:' + (selE.epost || ''),
+        isScheduled: scheduled && !this.state.reschedule,
+        showSchedForm: !scheduled || this.state.reschedule,
+        schedDayLabel: schedDayLabel,
+        schedTimeLabel: schedTimeLabel,
+        hasPris: selE.pris != null,
+        prisLabel: (selE.pris != null ? Number(selE.pris).toLocaleString('nb-NO') + ' kr' : '')
+      };
+    }
+
+    // ---- timeplan (uke) ----
+    const WD = ['Man', 'Tir', 'Ons', 'Tor', 'Fre', 'Lør', 'Søn'];
+    const MONTHS = ['januar', 'februar', 'mars', 'april', 'mai', 'juni', 'juli', 'august', 'september', 'oktober', 'november', 'desember'];
+    const today = new Date();
+    const ws = this.state.weekStart != null ? new Date(this.state.weekStart) : this.weekStartOf(today);
+    const isSameDay = (a, b) => a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+    let weekJobCount = 0;
+    const weekDays = [];
+    for (let i = 0; i < 7; i++) {
+      const d0 = new Date(ws.getTime() + i * 86400000);
+      const d1 = new Date(d0.getTime() + 86400000);
+      const isToday = isSameDay(d0, today);
+      const jobs = list.filter(e => e.scheduledAt && new Date(e.scheduledAt) >= d0 && new Date(e.scheduledAt) < d1)
+        .sort((a, b) => new Date(a.scheduledAt) - new Date(b.scheduledAt))
+        .map(e => {
+          const s = new Date(e.scheduledAt);
+          const en = new Date(s.getTime() + (e.durationMin || 120) * 60000);
+          const color = (window.CleanlyData.SERVICE_META[e.service] || {}).color || '#2B87C8';
+          return {
+            timeStr: this.hm(s) + '\u2013' + this.hm(en),
+            name: (e.fornavn + ' ' + e.etternavn).trim() || 'Uten navn',
+            serviceLabel: e.serviceLabel,
+            onClick: () => this.selectEnquiry(e, true),
+            style: 'display:block;width:100%;text-align:left;cursor:pointer;background:#fff;border:1px solid #E4F3FC;border-left:4px solid ' + color + ';border-radius:8px;padding:8px 10px;'
+          };
+        });
+      weekJobCount += jobs.length;
+      weekDays.push({
+        weekday: WD[i], dayNum: d0.getDate(), jobs: jobs, empty: jobs.length === 0,
+        colStyle: 'background:#fff;border:2px solid ' + (isToday ? '#2B87C8' : '#CFEBFB') + ';border-radius:14px;overflow:hidden;',
+        headStyle: 'padding:9px 8px;text-align:center;background:' + (isToday ? '#2B87C8' : '#F2FAFE') + ';color:' + (isToday ? '#fff' : '#3f6580') + ';border-bottom:1px solid #E4F3FC;'
+      });
+    }
+    const wsEnd = new Date(ws.getTime() + 6 * 86400000);
+    const weekLabel = ws.getDate() + '. ' + MONTHS[ws.getMonth()] + ' \u2013 ' + wsEnd.getDate() + '. ' + MONTHS[wsEnd.getMonth()];
+
+    const waitingList = list
+      .filter(e => !e.scheduledAt && e.status !== 'ferdig' && e.status !== 'avvist')
+      .map(e => {
+        const meta = SM[e.status] || { label: e.status, color: '#8095a3' };
+        return {
+          name: (e.fornavn + ' ' + e.etternavn).trim() || 'Uten navn',
+          serviceLabel: e.serviceLabel,
+          adresse: e.adresse || '\u2014',
+          statusColor: meta.color,
+          dateStr: this.dateStr(e.createdAt),
+          onClick: () => this.selectEnquiry(e, true)
+        };
+      });
+
+    const tabBase = 'font-family:\'Baloo 2\',sans-serif;font-weight:700;font-size:15px;padding:9px 22px;border-radius:999px;border:none;cursor:pointer;';
+    const tabStyle = active => tabBase + (active ? 'background:#2B87C8;color:#fff;' : 'background:transparent;color:#3f6580;');
+
+    return {
+      authed: this.state.authed,
+      notAuthed: !this.state.authed,
+      email: this.state.email,
+      pass: this.state.pass,
+      hasError: this.state.error,
+      loginLoading: this.state.loginLoading,
+      onEmailInput: ev => this.setState({ email: ev.target.value, error: false }),
+      onPassInput: ev => this.setState({ pass: ev.target.value, error: false }),
+      onLogin: ev => this.onLogin(ev),
+      onLogout: () => this.onLogout(),
+      stats: stats,
+      hasDemo: this.state.hasDemo,
+      onClearDemo: () => this.clearDemo(),
+      rows: rows,
+      hasRows: rows.length > 0,
+      noRows: rows.length === 0,
+      statusFilters: statusFilters,
+      q: this.state.q,
+      onSearch: ev => this.setState({ q: ev.target.value }),
+      hasSelected: !!sel,
+      sel: sel,
+      gridCols: sel ? 'minmax(0,1.6fr) minmax(0,1fr)' : '1fr',
+      clearSelection: () => this.setState({ selectedId: null }),
+      onStatusChange: ev => this.changeStatus(this.state.selectedId, ev.target.value),
+      onDelete: () => this.del(this.state.selectedId),
+      exportCsv: () => this.exportCsv(),
+      isListe: this.state.view === 'liste',
+      isTimeplan: this.state.view === 'timeplan',
+      showListe: () => this.setState({ view: 'liste' }),
+      showTimeplan: () => this.setState({ view: 'timeplan' }),
+      tabListeStyle: tabStyle(this.state.view === 'liste'),
+      tabTimeplanStyle: tabStyle(this.state.view === 'timeplan'),
+      weekDays: weekDays,
+      weekLabel: weekLabel,
+      weekJobCount: weekJobCount,
+      prevWeek: () => this.shiftWeek(-1),
+      nextWeek: () => this.shiftWeek(1),
+      thisWeek: () => this.setState({ weekStart: null }),
+      waiting: waitingList,
+      hasWaiting: waitingList.length > 0,
+      noWaiting: waitingList.length === 0,
+      formDate: this.state.formDate,
+      formTime: this.state.formTime,
+      formDur: String(this.state.formDur),
+      onFormDate: ev => this.setState({ formDate: ev.target.value }),
+      onFormTime: ev => this.setState({ formTime: ev.target.value }),
+      onFormDur: ev => this.setState({ formDur: Number(ev.target.value) }),
+      onSchedule: () => this.schedule(),
+      startReschedule: () => this.setState({ reschedule: true }),
+      onUnschedule: () => this.unschedule(this.state.selectedId),
+      formPris: this.state.formPris,
+      onFormPris: ev => this.setState({ formPris: ev.target.value }),
+      onSavePris: () => this.savePris()
+    };
+  }
+}
+</script>
+</body>
+</html>

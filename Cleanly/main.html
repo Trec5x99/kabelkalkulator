@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<title>husdetaljering.no | Vindusvask, maling og rydding på Nordstrand</title>
+<meta name="description" content="husdetaljering.no er et ungdomsdrevet firma fra Nordstrand i Oslo. Vi tar vindusvask (karmer vaskes gratis), husmaling, gjerdemaling og garasjerydding. Få gratis pris i dag." />
+<meta name="keywords" content="vindusvask Nordstrand, husmaling Oslo, garasjerydding, ungdomsfirma, gjerdemaling, vindusvask abonnement" />
+<meta name="robots" content="index, follow" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="husdetaljering.no" />
+<meta property="og:title" content="husdetaljering.no | Vindusvask, maling og rydding på Nordstrand" />
+<meta property="og:description" content="Ungdomsdrevet firma fra Nordstrand. Skinnende vinduer, nymalte hus og ryddige garasjer. Få gratis pris." />
+<meta property="og:url" content="https://husdetaljering.no/" />
+<meta property="og:image" content="img/p02.jpeg" />
+<meta property="og:locale" content="nb_NO" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="husdetaljering.no | Vindusvask, maling og rydding på Nordstrand" />
+<meta name="twitter:description" content="Ungdomsdrevet firma fra Nordstrand. Vinduskarmer vaskes gratis. Få gratis pris." />
+<meta name="twitter:image" content="img/p02.jpeg" />
+<link rel="canonical" href="https://husdetaljering.no/" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet" />
+<script src="cleanly-data.js"></script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "LocalBusiness",
+  "name": "husdetaljering.no",
+  "description": "Ungdomsdrevet firma fra Nordstrand som tilbyr vindusvask, husmaling, gjerdemaling, garasjerydding og hagearbeid.",
+  "areaServed": ["Nordstrand", "Oslo"],
+  "address": { "@type": "PostalAddress", "addressLocality": "Nordstrand", "addressRegion": "Oslo", "addressCountry": "NO" },
+  "url": "https://husdetaljering.no/",
+  "makesOffer": [
+    { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Vindusvask" } },
+    { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Husmaling og gjerdemaling" } },
+    { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Garasjerydding og bortkjøring" } },
+    { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Hagearbeid" } }
+  ]
+}
+</script>
+<style>
+  html { scroll-behavior: smooth; scroll-padding-top: 92px; }
+  body { margin: 0; }
+  a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 3px solid #2B87C8; outline-offset: 2px; }
+  @keyframes floaty { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-14px); } }
+</style>
+</helmet>
+
+<div style="font-family:'Nunito Sans',system-ui,-apple-system,sans-serif;color:#123047;background:#ffffff;overflow-x:hidden;line-height:1.55;">
+
+  <!-- ============ HEADER / STICKY NAV ============ -->
+  <header data-screen-label="Header" style="position:sticky;top:0;z-index:50;background:rgba(255,255,255,0.92);backdrop-filter:blur(8px);border-bottom:1px solid #E4F3FC;">
+    <div style="max-width:1120px;margin:0 auto;padding:12px 22px;display:flex;align-items:center;justify-content:space-between;gap:16px;">
+      <a href="#top" style="display:flex;align-items:center;text-decoration:none;">
+        <img src="Logo og navn.png" alt="husdetaljering.no – vindusvask og rydding på Nordstrand" style="height:38px;width:auto;display:block;" />
+      </a>
+
+      <sc-if value="{{ isDesktop }}" hint-placeholder-val="{{ true }}">
+        <nav aria-label="Hovedmeny" style="display:flex;align-items:center;gap:30px;">
+          <a href="#tjenester" style="text-decoration:none;color:#123047;font-weight:700;font-size:16px;">Tjenester</a>
+          <a href="#om-oss" style="text-decoration:none;color:#123047;font-weight:700;font-size:16px;">Om oss</a>
+          <a href="#kontakt" style="text-decoration:none;color:#123047;font-weight:700;font-size:16px;">Kontakt</a>
+          <a href="#skjema" style="display:inline-flex;align-items:center;background:#2B87C8;color:#fff;font-family:'Baloo 2',sans-serif;font-weight:700;font-size:16px;padding:11px 22px;border-radius:999px;text-decoration:none;box-shadow:0 6px 16px rgba(43,135,200,.28);" style-hover="background:#216a9e;">Få gratis pris</a>
+        </nav>
+      </sc-if>
+
+      <sc-if value="{{ isMobile }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <a href="#skjema" onClick="{{ closeMenu }}" style="display:inline-flex;align-items:center;background:#2B87C8;color:#fff;font-family:'Baloo 2',sans-serif;font-weight:700;font-size:15px;padding:10px 18px;border-radius:999px;text-decoration:none;box-shadow:0 6px 16px rgba(43,135,200,.28);">Få gratis pris</a>
+          <button onClick="{{ toggleMenu }}" aria-label="Meny" style="display:flex;flex-direction:column;gap:5px;background:#F2FAFE;border:2px solid #CFEBFB;border-radius:12px;padding:11px 10px;cursor:pointer;">
+            <span style="display:block;width:22px;height:2.5px;background:#123047;border-radius:2px;"></span>
+            <span style="display:block;width:22px;height:2.5px;background:#123047;border-radius:2px;"></span>
+            <span style="display:block;width:22px;height:2.5px;background:#123047;border-radius:2px;"></span>
+          </button>
+        </div>
+      </sc-if>
+    </div>
+
+    <sc-if value="{{ menuOpen }}" hint-placeholder-val="{{ false }}">
+      <nav aria-label="Mobilmeny" style="border-top:1px solid #E4F3FC;background:#fff;display:flex;flex-direction:column;padding:8px 22px 18px;">
+        <a href="#tjenester" onClick="{{ closeMenu }}" style="text-decoration:none;color:#123047;font-weight:700;font-size:18px;padding:14px 0;border-bottom:1px solid #F0F8FD;">Tjenester</a>
+        <a href="#om-oss" onClick="{{ closeMenu }}" style="text-decoration:none;color:#123047;font-weight:700;font-size:18px;padding:14px 0;border-bottom:1px solid #F0F8FD;">Om oss</a>
+        <a href="#kontakt" onClick="{{ closeMenu }}" style="text-decoration:none;color:#123047;font-weight:700;font-size:18px;padding:14px 0;">Kontakt</a>
+      </nav>
+    </sc-if>
+  </header>
+
+  <main id="top">
+
+    <!-- ============ HERO ============ -->
+    <section data-screen-label="Hero" style="position:relative;background:#F2FAFE;overflow:hidden;">
+      <div aria-hidden="true" style="position:absolute;top:-40px;right:8%;width:120px;height:120px;border-radius:50%;background:#CFEBFB;opacity:.55;animation:floaty 7s ease-in-out infinite;"></div>
+      <div aria-hidden="true" style="position:absolute;bottom:30px;left:4%;width:64px;height:64px;border-radius:50%;background:#CFEBFB;opacity:.5;animation:floaty 9s ease-in-out infinite;"></div>
+      <div style="max-width:1120px;margin:0 auto;padding:70px 22px 84px;display:flex;flex-wrap:wrap;gap:48px;align-items:center;">
+        <div style="flex:1 1 420px;min-width:300px;position:relative;z-index:2;">
+          <h1 style="font-family:'Baloo 2',sans-serif;font-weight:800;font-size:clamp(34px,6vw,58px);line-height:1.08;margin:0 0 20px;color:#123047;">Skinnende vinduer, nymalte hus og ryddige garasjer på&nbsp;Nordstrand.</h1>
+          <p style="font-size:clamp(18px,2.4vw,22px);margin:0 0 32px;max-width:520px;color:#2d4d63;">Gjort av to ungdommer du kan stole på. Send oss en henvendelse, så får du en pris helt gratis.</p>
+          <a href="#skjema" style="display:inline-flex;align-items:center;gap:10px;background:#2B87C8;color:#fff;font-family:'Baloo 2',sans-serif;font-weight:700;font-size:clamp(19px,2.4vw,23px);padding:18px 40px;border-radius:999px;text-decoration:none;box-shadow:0 10px 24px rgba(43,135,200,.32);" style-hover="background:#216a9e;">Få gratis pris</a>
+          <p style="margin:22px 0 0;font-size:15px;font-weight:700;color:#3f6580;">Lokale gutter fra Nordstrand&nbsp;&nbsp;•&nbsp;&nbsp;Gratis befaring&nbsp;&nbsp;•&nbsp;&nbsp;Vinduskarmer vaskes gratis</p>
+        </div>
+        <div style="flex:1 1 360px;min-width:280px;position:relative;z-index:2;">
+          <img src="img/p03.jpeg" alt="Ungdom fra Cleanly vasker vinduer med stang på et hus på Nordstrand" loading="eager" style="width:100%;aspect-ratio:4/5;object-fit:cover;border-radius:24px;border:2px solid #CFEBFB;display:block;box-shadow:0 18px 40px rgba(43,135,200,.16);" />
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ TJENESTER ============ -->
+    <section id="tjenester" data-screen-label="Tjenester" style="max-width:1120px;margin:0 auto;padding:76px 22px;">
+      <h2 style="font-family:'Baloo 2',sans-serif;font-weight:800;font-size:clamp(28px,5vw,44px);margin:0 0 10px;">Dette hjelper vi deg med</h2>
+      <p style="font-size:18px;margin:0 0 36px;color:#2d4d63;max-width:560px;">Enkelt og greit. Trykk på en tjeneste, så tar du det videre i skjemaet nederst.</p>
+
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        <a href="#skjema" style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px;text-decoration:none;background:#F2FAFE;border:2px solid #CFEBFB;border-radius:18px;padding:22px 26px;" style-hover="border-color:#2B87C8;">
+          <div><div style="font-family:'Baloo 2',sans-serif;font-weight:700;font-size:22px;color:#123047;">Vindusvask</div><div style="color:#3f6580;font-size:16px;">Engangsvask eller fast abonnement. Vinduskarmer vaskes <strong style="color:#2B87C8;">gratis</strong>.</div></div>
+          <span style="font-family:'Baloo 2',sans-serif;font-weight:700;color:#2B87C8;font-size:16px;white-space:nowrap;">Få pris →</span>
+        </a>
+        <a href="#skjema" style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px;text-decoration:none;background:#F2FAFE;border:2px solid #CFEBFB;border-radius:18px;padding:22px 26px;" style-hover="border-color:#2B87C8;">
+          <div><div style="font-family:'Baloo 2',sans-serif;font-weight:700;font-size:22px;color:#123047;">Maling av hus og gjerde</div><div style="color:#3f6580;font-size:16px;">Vi maler skikkelig — med stillas når det trengs.</div></div>
+          <span style="font-family:'Baloo 2',sans-serif;font-weight:700;color:#2B87C8;font-size:16px;white-space:nowrap;">Få pris →</span>
+        </a>
+        <a href="#skjema" style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px;text-decoration:none;background:#F2FAFE;border:2px solid #CFEBFB;border-radius:18px;padding:22px 26px;" style-hover="border-color:#2B87C8;">
+          <div><div style="font-family:'Baloo 2',sans-serif;font-weight:700;font-size:22px;color:#123047;">Garasjerydding og bortkjøring</div><div style="color:#3f6580;font-size:16px;">Vi rydder, bærer ut og kjører bort. Du slipper å løfte en finger.</div></div>
+          <span style="font-family:'Baloo 2',sans-serif;font-weight:700;color:#2B87C8;font-size:16px;white-space:nowrap;">Få pris →</span>
+        </a>
+        <a href="#skjema" style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px;text-decoration:none;background:#F2FAFE;border:2px solid #CFEBFB;border-radius:18px;padding:22px 26px;" style-hover="border-color:#2B87C8;">
+          <div><div style="font-family:'Baloo 2',sans-serif;font-weight:700;font-size:22px;color:#123047;">Hagearbeid</div><div style="color:#3f6580;font-size:16px;">Klipping, luking, rydding — det som må gjøres i hagen.</div></div>
+          <span style="font-family:'Baloo 2',sans-serif;font-weight:700;color:#2B87C8;font-size:16px;white-space:nowrap;">Få pris →</span>
+        </a>
+        <a href="#skjema" style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px;text-decoration:none;background:#F2FAFE;border:2px solid #CFEBFB;border-radius:18px;padding:22px 26px;" style-hover="border-color:#2B87C8;">
+          <div><div style="font-family:'Baloo 2',sans-serif;font-weight:700;font-size:22px;color:#123047;">Annet oppdrag</div><div style="color:#3f6580;font-size:16px;">Har du noe annet? Bare spør, så finner vi ut av det.</div></div>
+          <span style="font-family:'Baloo 2',sans-serif;font-weight:700;color:#2B87C8;font-size:16px;white-space:nowrap;">Få pris →</span>
+        </a>
+      </div>
+
+      <div style="margin-top:32px;text-align:center;">
+        <a href="#skjema" style="display:inline-flex;align-items:center;background:#2B87C8;color:#fff;font-family:'Baloo 2',sans-serif;font-weight:700;font-size:20px;padding:16px 38px;border-radius:999px;text-decoration:none;box-shadow:0 10px 24px rgba(43,135,200,.3);" style-hover="background:#216a9e;">Få gratis pris</a>
+      </div>
+    </section>
+
+    <!-- ============ FØR OG ETTER ============ -->
+    <section data-screen-label="Før og etter" style="background:#F2FAFE;">
+      <div style="max-width:1120px;margin:0 auto;padding:70px 22px;">
+        <h2 style="font-family:'Baloo 2',sans-serif;font-weight:800;font-size:clamp(28px,5vw,44px);margin:0 0 8px;">Før og etter</h2>
+        <p style="font-size:18px;color:#2d4d63;margin:0 0 32px;max-width:560px;">Samme vindu, samme dag. Sånn ser det ut når vi har vært innom.</p>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px;">
+          <figure style="margin:0;">
+            <img src="img/p01.jpeg" alt="Vindu og karm før vask hos kunde på Nordstrand" loading="lazy" style="width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:20px;border:2px solid #CFEBFB;display:block;" />
+            <figcaption style="font-weight:700;color:#3f6580;margin-top:10px;font-size:15px;">Før — matt karm og skittent glass</figcaption>
+          </figure>
+          <figure style="margin:0;">
+            <img src="img/p02.jpeg" alt="Samme vindu og karm etter vindusvask av Cleanly på Nordstrand" loading="lazy" style="width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:20px;border:2px solid #CFEBFB;display:block;" />
+            <figcaption style="font-weight:700;color:#2B87C8;margin-top:10px;font-size:15px;">Etter — rent glass og rene karmer (gratis)</figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ SLIK JOBBER VI ============ -->
+    <section id="slik-jobber-vi" data-screen-label="Slik jobber vi" style="background:#F2FAFE;">
+      <div style="max-width:1120px;margin:0 auto;padding:76px 22px;">
+        <h2 style="font-family:'Baloo 2',sans-serif;font-weight:800;font-size:clamp(28px,5vw,44px);margin:0 0 36px;">Slik jobber vi</h2>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px;">
+          <div style="background:#fff;border:2px solid #CFEBFB;border-radius:18px;padding:24px;">
+            <div style="width:44px;height:44px;border-radius:50%;background:#CFEBFB;color:#2B87C8;font-family:'Baloo 2',sans-serif;font-weight:800;font-size:22px;display:flex;align-items:center;justify-content:center;margin-bottom:14px;">1</div>
+            <div style="font-family:'Baloo 2',sans-serif;font-weight:700;font-size:20px;margin-bottom:4px;">Send henvendelse</div>
+            <div style="color:#3f6580;font-size:16px;">Fyll ut det lille skjemaet. Tar to minutter.</div>
+          </div>
+          <div style="background:#fff;border:2px solid #CFEBFB;border-radius:18px;padding:24px;">
+            <div style="width:44px;height:44px;border-radius:50%;background:#CFEBFB;color:#2B87C8;font-family:'Baloo 2',sans-serif;font-weight:800;font-size:22px;display:flex;align-items:center;justify-content:center;margin-bottom:14px;">2</div>
+            <div style="font-family:'Baloo 2',sans-serif;font-weight:700;font-size:20px;margin-bottom:4px;">Gratis pris</div>
+            <div style="color:#3f6580;font-size:16px;">Vi tar en titt og gir deg en pris uten at det koster noe.</div>
+          </div>
+          <div style="background:#fff;border:2px solid #CFEBFB;border-radius:18px;padding:24px;">
+            <div style="width:44px;height:44px;border-radius:50%;background:#CFEBFB;color:#2B87C8;font-family:'Baloo 2',sans-serif;font-weight:800;font-size:22px;display:flex;align-items:center;justify-content:center;margin-bottom:14px;">3</div>
+            <div style="font-family:'Baloo 2',sans-serif;font-weight:700;font-size:20px;margin-bottom:4px;">Vi gjør jobben</div>
+            <div style="color:#3f6580;font-size:16px;">Vi møter opp, gjør en skikkelig jobb og rydder etter oss.</div>
+          </div>
+          <div style="background:#fff;border:2px solid #CFEBFB;border-radius:18px;padding:24px;">
+            <div style="width:44px;height:44px;border-radius:50%;background:#CFEBFB;color:#2B87C8;font-family:'Baloo 2',sans-serif;font-weight:800;font-size:22px;display:flex;align-items:center;justify-content:center;margin-bottom:14px;">4</div>
+            <div style="font-family:'Baloo 2',sans-serif;font-weight:700;font-size:20px;margin-bottom:4px;">Du er fornøyd</div>
+            <div style="color:#3f6580;font-size:16px;">Er det noe, sier du fra. Vi fikser det.</div>
+          </div>
+        </div>
+
+        <!-- VIDEO -->
+        <div style="margin-top:40px;">
+          <h3 style="font-family:'Baloo 2',sans-serif;font-weight:700;font-size:24px;margin:0 0 14px;">Se oss i arbeid</h3>
+          <!-- Bytt gjerne <video>-taggen med en Instagram- eller YouTube-embed når du vil -->
+          <video src="img/video.mp4" controls playsinline preload="metadata" poster="img/p06.jpeg" aria-label="Video av Cleanly på jobb på Nordstrand" style="width:100%;max-width:760px;aspect-ratio:9/16;max-height:640px;border-radius:20px;border:2px solid #CFEBFB;display:block;background:#123047;box-shadow:0 18px 40px rgba(43,135,200,.14);"></video>
+          <p style="margin:14px 0 0;font-size:15px;color:#3f6580;">Følg med på mer på <a href="https://www.instagram.com/cleanly.no" target="_blank" rel="noopener" style="color:#2B87C8;font-weight:700;">@cleanly.no</a>.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ OM OSS ============ -->
+    <section id="om-oss" data-screen-label="Om oss" style="max-width:1120px;margin:0 auto;padding:76px 22px;display:flex;flex-wrap:wrap;gap:48px;align-items:center;">
+      <div style="flex:1 1 340px;min-width:280px;">
+        <img src="img/p05.jpeg" alt="Gutt fra Cleanly på vei til malejobb med utstyr på Nordstrand" loading="lazy" style="width:100%;aspect-ratio:4/5;object-fit:cover;border-radius:24px;border:2px solid #CFEBFB;display:block;box-shadow:0 18px 40px rgba(43,135,200,.16);" />
+      </div>
+      <div style="flex:1 1 420px;min-width:300px;">
+        <h2 style="font-family:'Baloo 2',sans-serif;font-weight:800;font-size:clamp(28px,5vw,44px);margin:0 0 18px;">Hvem er vi?</h2>
+        <p style="font-size:18px;color:#2d4d63;margin:0 0 16px;">Vi er David (18) og Noah (17), to elever fra Kongshavn. I mars startet vi med null kroner, én klut, en nal og en flaske vindussåpe.</p>
+        <p style="font-size:18px;color:#2d4d63;margin:0 0 16px;">Vi banket på dører rundt hele Nordstrand, og siden da har vi bygget oss opp til profesjonelt utstyr og større prosjekter — som maling med stillas. Nå gir vi også jobb til andre ungdommer i nabolaget.</p>
+        <p style="font-size:18px;color:#2d4d63;margin:0 0 28px;">Vi tror på hardt arbeid, at folk skal kunne stole på oss, og at en jobb skal gjøres skikkelig. Vi bor her selv, så vi legger igjen et godt inntrykk hver gang.</p>
+        <a href="#skjema" style="display:inline-flex;align-items:center;background:#2B87C8;color:#fff;font-family:'Baloo 2',sans-serif;font-weight:700;font-size:20px;padding:16px 38px;border-radius:999px;text-decoration:none;box-shadow:0 10px 24px rgba(43,135,200,.3);" style-hover="background:#216a9e;">Få gratis pris</a>
+      </div>
+    </section>
+
+    <!-- ============ FRA HVERDAGEN ============ -->
+    <section data-screen-label="Fra hverdagen" style="max-width:1120px;margin:0 auto;padding:0 22px 76px;">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;">
+        <img src="img/p04.jpeg" alt="Vindusvask av murhus på Nordstrand" loading="lazy" style="width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:16px;border:2px solid #CFEBFB;display:block;" />
+        <img src="img/p14.jpeg" alt="Gjerde malt av Cleanly på Nordstrand" loading="lazy" style="width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:16px;border:2px solid #CFEBFB;display:block;" />
+        <img src="img/p07.jpeg" alt="Detaljarbeid rundt vindu på hus i Oslo" loading="lazy" style="width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:16px;border:2px solid #CFEBFB;display:block;" />
+        <img src="img/p08.jpeg" alt="På vei til malejobb på Nordstrand" loading="lazy" style="width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:16px;border:2px solid #CFEBFB;display:block;" />
+      </div>
+    </section>
+
+    <!-- ============ SKJEMA ============ -->
+    <section id="skjema" data-screen-label="Skjema" style="background:#F2FAFE;position:relative;overflow:hidden;">
+      <div aria-hidden="true" style="position:absolute;top:40px;left:6%;width:80px;height:80px;border-radius:50%;background:#CFEBFB;opacity:.5;animation:floaty 8s ease-in-out infinite;"></div>
+      <div style="max-width:680px;margin:0 auto;padding:76px 22px;position:relative;z-index:2;">
+
+        <sc-if value="{{ notSubmitted }}" hint-placeholder-val="{{ true }}">
+          <div>
+            <h2 style="font-family:'Baloo 2',sans-serif;font-weight:800;font-size:clamp(28px,5vw,44px);margin:0 0 10px;text-align:center;">Få gratis pris</h2>
+            <p style="font-size:18px;color:#2d4d63;margin:0 0 30px;text-align:center;">Velg hva du trenger hjelp til, så tar vi resten.</p>
+
+            <form onSubmit="{{ onSubmit }}" style="background:#fff;border:2px solid #CFEBFB;border-radius:24px;padding:clamp(20px,4vw,38px);">
+
+              <!-- 1. velg tjeneste -->
+              <div style="margin-bottom:24px;">
+                <label style="display:block;font-family:'Baloo 2',sans-serif;font-weight:700;font-size:19px;margin-bottom:12px;">1. Hva trenger du hjelp til?</label>
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;">
+                  <sc-for list="{{ serviceOptions }}" as="opt" hint-placeholder-count="5">
+                    <button type="button" onClick="{{ opt.onClick }}" style="{{ opt.cardStyle }}">
+                      <span>{{ opt.label }}</span>
+                    </button>
+                  </sc-for>
+                </div>
+              </div>
+
+              <sc-if value="{{ hasService }}" hint-placeholder-val="{{ false }}">
+                <div id="skjema-felter" style="border-top:1px solid #EAF5FC;padding-top:22px;">
+
+                  <!-- VINDUSVASK -->
+                  <sc-if value="{{ isVindusvask }}" hint-placeholder-val="{{ false }}">
+                    <div>
+                      <div style="margin-bottom:18px;">
+                        <label for="antall_vinduer" style="display:block;font-weight:700;font-size:15px;margin-bottom:6px;">Omtrent hvor mange vinduer?</label>
+                        <input id="antall_vinduer" name="antall_vinduer" type="number" min="1" placeholder="F.eks. 12" style="width:100%;padding:14px 16px;border:2px solid #CFEBFB;border-radius:12px;font-family:inherit;font-size:17px;color:#123047;background:#fff;box-sizing:border-box;" style-focus="border-color:#2B87C8;" />
+                      </div>
+                      <label style="display:flex;align-items:center;gap:12px;background:#F2FAFE;border:2px solid #CFEBFB;border-radius:12px;padding:14px 16px;margin-bottom:18px;cursor:pointer;font-weight:700;">
+                        <input type="checkbox" name="karmer" style="width:22px;height:22px;accent-color:#2B87C8;" />
+                        <span>Vask av vinduskarmer <span style="color:#2B87C8;">(GRATIS)</span></span>
+                      </label>
+                      <div style="margin-bottom:4px;">
+                        <label for="vindus_type" style="display:block;font-weight:700;font-size:15px;margin-bottom:6px;">Engangsvask eller abonnement?</label>
+                        <select id="vindus_type" name="vindus_type" style="width:100%;padding:14px 16px;border:2px solid #CFEBFB;border-radius:12px;font-family:inherit;font-size:17px;color:#123047;background:#fff;box-sizing:border-box;" style-focus="border-color:#2B87C8;">
+                          <option value="Engangsvask">Engangsvask</option>
+                          <option value="Abonnement – hver 2. uke">Abonnement – hver 2. uke</option>
+                          <option value="Abonnement – månedlig">Abonnement – månedlig</option>
+                          <option value="Abonnement – kvartalsvis">Abonnement – kvartalsvis</option>
+                        </select>
+                      </div>
+                    </div>
+                  </sc-if>
+
+                  <!-- MALING -->
+                  <sc-if value="{{ isMaling }}" hint-placeholder-val="{{ false }}">
+                    <div>
+                      <div style="margin-bottom:18px;">
+                        <label for="maling_hva" style="display:block;font-weight:700;font-size:15px;margin-bottom:6px;">Hva skal males?</label>
+                        <input id="maling_hva" name="maling_hva" type="text" placeholder="Hus, gjerde, eller noe annet" style="width:100%;padding:14px 16px;border:2px solid #CFEBFB;border-radius:12px;font-family:inherit;font-size:17px;color:#123047;background:#fff;box-sizing:border-box;" style-focus="border-color:#2B87C8;" />
+                      </div>
+                      <div style="margin-bottom:18px;">
+                        <label for="areal" style="display:block;font-weight:700;font-size:15px;margin-bottom:6px;">Omtrent hvor mange m²?</label>
+                        <input id="areal" name="areal" type="number" min="1" placeholder="F.eks. 90" style="width:100%;padding:14px 16px;border:2px solid #CFEBFB;border-radius:12px;font-family:inherit;font-size:17px;color:#123047;background:#fff;box-sizing:border-box;" style-focus="border-color:#2B87C8;" />
+                      </div>
+                      <sc-if value="{{ showBudget }}" hint-placeholder-val="{{ true }}">
+                        <div style="margin-bottom:12px;">
+                          <label for="budsjett" style="display:block;font-weight:700;font-size:15px;margin-bottom:6px;">Omtrentlig budsjett (kr)</label>
+                          <input id="budsjett" name="budsjett" type="number" min="0" placeholder="F.eks. 15000" style="width:100%;padding:14px 16px;border:2px solid #CFEBFB;border-radius:12px;font-family:inherit;font-size:17px;color:#123047;background:#fff;box-sizing:border-box;" style-focus="border-color:#2B87C8;" />
+                        </div>
+                      </sc-if>
+                      <button type="button" onClick="{{ toggleBudget }}" style="background:none;border:none;color:#2B87C8;font-family:inherit;font-weight:700;font-size:15px;cursor:pointer;padding:4px 0;text-decoration:underline;">
+                        <sc-if value="{{ showBudget }}" hint-placeholder-val="{{ true }}"><span>Jeg vet ikke hvor mye maling koster</span></sc-if>
+                        <sc-if value="{{ budgetUnknown }}" hint-placeholder-val="{{ false }}"><span>Skriv inn budsjett likevel</span></sc-if>
+                      </button>
+                    </div>
+                  </sc-if>
+
+                  <!-- GARASJE -->
+                  <sc-if value="{{ isGarasje }}" hint-placeholder-val="{{ false }}">
+                    <div>
+                      <div style="margin-bottom:18px;">
+                        <label for="garasje_beskrivelse" style="display:block;font-weight:700;font-size:15px;margin-bottom:6px;">Hva skal fjernes?</label>
+                        <textarea id="garasje_beskrivelse" name="garasje_beskrivelse" rows="3" placeholder="Fortell kort hva som ligger der og skal bort" style="width:100%;padding:14px 16px;border:2px solid #CFEBFB;border-radius:12px;font-family:inherit;font-size:17px;color:#123047;background:#fff;box-sizing:border-box;resize:vertical;" style-focus="border-color:#2B87C8;"></textarea>
+                      </div>
+                      <label style="display:flex;align-items:center;gap:12px;background:#F2FAFE;border:2px solid #CFEBFB;border-radius:12px;padding:14px 16px;cursor:pointer;font-weight:700;">
+                        <input type="checkbox" name="rives" style="width:22px;height:22px;accent-color:#2B87C8;" />
+                        <span>Noe skal rives</span>
+                      </label>
+                    </div>
+                  </sc-if>
+
+                  <!-- HAGE -->
+                  <sc-if value="{{ isHage }}" hint-placeholder-val="{{ false }}">
+                    <div style="margin-bottom:4px;">
+                      <label for="hage_beskrivelse" style="display:block;font-weight:700;font-size:15px;margin-bottom:6px;">Hva skal gjøres i hagen?</label>
+                      <textarea id="hage_beskrivelse" name="hage_beskrivelse" rows="3" placeholder="F.eks. klippe plen, luke bed, rydde kvist" style="width:100%;padding:14px 16px;border:2px solid #CFEBFB;border-radius:12px;font-family:inherit;font-size:17px;color:#123047;background:#fff;box-sizing:border-box;resize:vertical;" style-focus="border-color:#2B87C8;"></textarea>
+                    </div>
+                  </sc-if>
+
+                  <!-- ANNET -->
+                  <sc-if value="{{ isAnnet }}" hint-placeholder-val="{{ false }}">
+                    <div style="margin-bottom:4px;">
+                      <label for="annet_beskrivelse" style="display:block;font-weight:700;font-size:15px;margin-bottom:6px;">Hva trenger du hjelp til?</label>
+                      <textarea id="annet_beskrivelse" name="annet_beskrivelse" rows="3" placeholder="Fortell kort hva du tenker på" style="width:100%;padding:14px 16px;border:2px solid #CFEBFB;border-radius:12px;font-family:inherit;font-size:17px;color:#123047;background:#fff;box-sizing:border-box;resize:vertical;" style-focus="border-color:#2B87C8;"></textarea>
+                    </div>
+                  </sc-if>
+
+                  <!-- FELLES FELTER -->
+                  <div style="border-top:1px solid #EAF5FC;margin-top:24px;padding-top:22px;">
+                    <label style="display:block;font-family:'Baloo 2',sans-serif;font-weight:700;font-size:19px;margin-bottom:14px;">2. Litt om deg</label>
+                    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:18px;">
+                      <div>
+                        <label for="fornavn" style="display:block;font-weight:700;font-size:15px;margin-bottom:6px;">Fornavn</label>
+                        <input id="fornavn" name="fornavn" type="text" required style="width:100%;padding:14px 16px;border:2px solid #CFEBFB;border-radius:12px;font-family:inherit;font-size:17px;color:#123047;background:#fff;box-sizing:border-box;" style-focus="border-color:#2B87C8;" />
+                      </div>
+                      <div>
+                        <label for="etternavn" style="display:block;font-weight:700;font-size:15px;margin-bottom:6px;">Etternavn</label>
+                        <input id="etternavn" name="etternavn" type="text" required style="width:100%;padding:14px 16px;border:2px solid #CFEBFB;border-radius:12px;font-family:inherit;font-size:17px;color:#123047;background:#fff;box-sizing:border-box;" style-focus="border-color:#2B87C8;" />
+                      </div>
+                    </div>
+                    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:18px;">
+                      <div>
+                        <label for="mobil" style="display:block;font-weight:700;font-size:15px;margin-bottom:6px;">Mobilnummer</label>
+                        <input id="mobil" name="mobil" type="tel" required placeholder="F.eks. 412 34 567" style="width:100%;padding:14px 16px;border:2px solid #CFEBFB;border-radius:12px;font-family:inherit;font-size:17px;color:#123047;background:#fff;box-sizing:border-box;" style-focus="border-color:#2B87C8;" />
+                      </div>
+                      <div>
+                        <label for="epost" style="display:block;font-weight:700;font-size:15px;margin-bottom:6px;">E-post</label>
+                        <input id="epost" name="epost" type="email" required placeholder="deg@epost.no" style="width:100%;padding:14px 16px;border:2px solid #CFEBFB;border-radius:12px;font-family:inherit;font-size:17px;color:#123047;background:#fff;box-sizing:border-box;" style-focus="border-color:#2B87C8;" />
+                      </div>
+                    </div>
+                    <div style="margin-bottom:18px;">
+                      <label for="adresse" style="display:block;font-weight:700;font-size:15px;margin-bottom:6px;">Adresse</label>
+                      <input id="adresse" name="adresse" type="text" required placeholder="Gate og nummer, Nordstrand" style="width:100%;padding:14px 16px;border:2px solid #CFEBFB;border-radius:12px;font-family:inherit;font-size:17px;color:#123047;background:#fff;box-sizing:border-box;" style-focus="border-color:#2B87C8;" />
+                    </div>
+
+                    <div style="margin-bottom:18px;">
+                      <label for="bilde" style="display:block;font-weight:700;font-size:15px;margin-bottom:6px;">Last opp et bilde av huset <span style="font-weight:400;color:#6a8598;">(valgfritt)</span></label>
+                      <input id="bilde" name="bilde" type="file" accept="image/*" onChange="{{ onImageChange }}" style="width:100%;padding:12px 14px;border:2px dashed #CFEBFB;border-radius:12px;font-family:inherit;font-size:15px;color:#123047;background:#F8FCFF;box-sizing:border-box;" style-focus="border-color:#2B87C8;" />
+                      <sc-if value="{{ hasImage }}" hint-placeholder-val="{{ false }}">
+                        <div style="margin-top:12px;display:flex;align-items:center;gap:14px;">
+                          {{ previewImg }}
+                          <button type="button" onClick="{{ clearImage }}" style="background:none;border:none;color:#2B87C8;font-family:inherit;font-weight:700;font-size:15px;cursor:pointer;text-decoration:underline;">Fjern bilde</button>
+                        </div>
+                      </sc-if>
+                    </div>
+
+                    <div style="margin-bottom:26px;">
+                      <label for="melding" style="display:block;font-weight:700;font-size:15px;margin-bottom:6px;">Melding <span style="font-weight:400;color:#6a8598;">(valgfritt)</span></label>
+                      <textarea id="melding" name="melding" rows="3" placeholder="Noe mer vi bør vite?" style="width:100%;padding:14px 16px;border:2px solid #CFEBFB;border-radius:12px;font-family:inherit;font-size:17px;color:#123047;background:#fff;box-sizing:border-box;resize:vertical;" style-focus="border-color:#2B87C8;"></textarea>
+                    </div>
+
+                    <button type="submit" style="width:100%;background:#2B87C8;color:#fff;font-family:'Baloo 2',sans-serif;font-weight:700;font-size:22px;padding:18px;border-radius:999px;border:none;cursor:pointer;box-shadow:0 10px 24px rgba(43,135,200,.3);" style-hover="background:#216a9e;">Send henvendelse</button>
+                    <p style="text-align:center;font-size:14px;color:#6a8598;margin:14px 0 0;">Gratis og uforpliktende. Vi svarer så fort vi kan.</p>
+                  </div>
+                </div>
+              </sc-if>
+            </form>
+          </div>
+        </sc-if>
+
+        <!-- BEKREFTELSE -->
+        <sc-if value="{{ submitted }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#fff;border:2px solid #CFEBFB;border-radius:24px;padding:clamp(24px,5vw,44px);text-align:center;">
+            <div style="width:72px;height:72px;border-radius:50%;background:#CFEBFB;color:#2B87C8;font-size:38px;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;">✓</div>
+            <h2 style="font-family:'Baloo 2',sans-serif;font-weight:800;font-size:clamp(26px,5vw,38px);margin:0 0 12px;">Takk! Vi har fått henvendelsen din.</h2>
+            <p style="font-size:18px;color:#2d4d63;margin:0 0 26px;">Vi tar kontakt så fort vi kan med en gratis pris. Her er det du sendte oss:</p>
+            <div style="text-align:left;background:#F2FAFE;border:2px solid #CFEBFB;border-radius:16px;padding:20px 22px;margin-bottom:26px;">
+              <sc-for list="{{ summaryLines }}" as="row" hint-placeholder-count="4">
+                <div style="display:flex;justify-content:space-between;gap:16px;padding:8px 0;border-bottom:1px solid #EAF5FC;">
+                  <span style="font-weight:700;color:#123047;">{{ row.label }}</span>
+                  <span style="color:#3f6580;text-align:right;">{{ row.value }}</span>
+                </div>
+              </sc-for>
+            </div>
+            <button type="button" onClick="{{ resetForm }}" style="background:#2B87C8;color:#fff;font-family:'Baloo 2',sans-serif;font-weight:700;font-size:18px;padding:14px 32px;border-radius:999px;border:none;cursor:pointer;box-shadow:0 8px 20px rgba(43,135,200,.28);" style-hover="background:#216a9e;">Send en ny henvendelse</button>
+          </div>
+        </sc-if>
+      </div>
+    </section>
+
+    <!-- ============ KONTAKT ============ -->
+    <section id="kontakt" data-screen-label="Kontakt" style="max-width:1120px;margin:0 auto;padding:76px 22px;">
+      <h2 style="font-family:'Baloo 2',sans-serif;font-weight:800;font-size:clamp(28px,5vw,44px);margin:0 0 28px;text-align:center;">Ta kontakt</h2>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-bottom:32px;">
+        <a href="tel:+4740000000" style="text-decoration:none;background:#F2FAFE;border:2px solid #CFEBFB;border-radius:18px;padding:24px;color:#123047;" style-hover="border-color:#2B87C8;">
+          <div style="font-weight:700;font-size:15px;color:#6a8598;margin-bottom:4px;">Telefon</div>
+          <div style="font-family:'Baloo 2',sans-serif;font-weight:700;font-size:22px;">400 00 000</div>
+        </a>
+        <a href="/cdn-cgi/l/email-protection#2a424f436a49464f4b444653044445" style="text-decoration:none;background:#F2FAFE;border:2px solid #CFEBFB;border-radius:18px;padding:24px;color:#123047;" style-hover="border-color:#2B87C8;">
+          <div style="font-weight:700;font-size:15px;color:#6a8598;margin-bottom:4px;">E-post</div>
+          <div style="font-family:'Baloo 2',sans-serif;font-weight:700;font-size:22px;"><span class="__cf_email__" data-cfemail="c3aba6aa83a0afa6a2adafbaedadac">[email&#160;protected]</span></div>
+        </a>
+        <a href="https://www.instagram.com/cleanly.no" target="_blank" rel="noopener" style="text-decoration:none;background:#F2FAFE;border:2px solid #CFEBFB;border-radius:18px;padding:24px;color:#123047;" style-hover="border-color:#2B87C8;">
+          <div style="font-weight:700;font-size:15px;color:#6a8598;margin-bottom:4px;">Instagram</div>
+          <div style="font-family:'Baloo 2',sans-serif;font-weight:700;font-size:22px;">@cleanly.no</div>
+        </a>
+        <div style="background:#F2FAFE;border:2px solid #CFEBFB;border-radius:18px;padding:24px;">
+          <div style="font-weight:700;font-size:15px;color:#6a8598;margin-bottom:4px;">Område</div>
+          <div style="font-family:'Baloo 2',sans-serif;font-weight:700;font-size:22px;">Nordstrand, Oslo</div>
+        </div>
+      </div>
+      <div style="text-align:center;">
+        <a href="#skjema" style="display:inline-flex;align-items:center;background:#2B87C8;color:#fff;font-family:'Baloo 2',sans-serif;font-weight:700;font-size:20px;padding:16px 38px;border-radius:999px;text-decoration:none;box-shadow:0 10px 24px rgba(43,135,200,.3);" style-hover="background:#216a9e;">Få gratis pris</a>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============ FOOTER ============ -->
+  <footer style="background:#123047;color:#cfe4f2;">
+    <div style="max-width:1120px;margin:0 auto;padding:40px 22px;display:flex;flex-wrap:wrap;gap:20px;align-items:center;justify-content:space-between;">
+      <div style="font-family:'Baloo 2',sans-serif;font-weight:800;font-size:26px;color:#fff;">husdetaljering.no</div>
+      <div style="font-size:15px;">Vindusvask · Maling · Rydding — på Nordstrand, Oslo</div>
+      <a href="https://www.instagram.com/cleanly.no" target="_blank" rel="noopener" style="color:#8fd0f5;text-decoration:none;font-weight:700;">@cleanly.no</a>
+    </div>
+    <div style="border-top:1px solid #1d456a;padding:16px 22px;text-align:center;font-size:13px;color:#7fa4c0;">© 2026 husdetaljering.no · Nordstrand, Oslo · <a href="Admin.dc.html" style="color:#7fa4c0;text-decoration:underline;">Eier-innlogging</a></div>
+  </footer>
+</div>
+</x-dc>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { service: '', budgetUnknown: false, imagePreview: null, submitted: false, summaryLines: [], isMobile: false, menuOpen: false };
+
+  componentDidMount() {
+    document.documentElement.lang = 'nb';
+    document.title = 'husdetaljering.no | Vindusvask, maling og rydding på Nordstrand';
+    this._onResize = () => this.setState({ isMobile: window.innerWidth < 820 });
+    this._onResize();
+    window.addEventListener('resize', this._onResize);
+  }
+  componentWillUnmount() { window.removeEventListener('resize', this._onResize); }
+
+  selectService(id) { this.setState({ service: id }); }
+  toggleBudget() { this.setState(s => ({ budgetUnknown: !s.budgetUnknown })); }
+
+  onImageChange(e) {
+    const f = e.target.files && e.target.files[0];
+    if (!f) { return; }
+    const r = new FileReader();
+    r.onload = ev => this.setState({ imagePreview: ev.target.result });
+    r.readAsDataURL(f);
+  }
+  clearImage() {
+    this.setState({ imagePreview: null });
+    const i = document.getElementById('bilde');
+    if (i) { i.value = ''; }
+  }
+
+  onSubmit(e) {
+    e.preventDefault();
+    const fd = new FormData(e.target);
+    const g = k => ((fd.get(k) || '') + '').trim();
+    const labels = { vindusvask: 'Vindusvask', maling: 'Maling av hus og gjerde', garasje: 'Garasjerydding og bortkjøring', hage: 'Hagearbeid', annet: 'Annet oppdrag' };
+    const s = this.state.service;
+    const lines = [];
+    lines.push(['Tjeneste', labels[s] || 'Ikke valgt']);
+    if (s === 'vindusvask') {
+      lines.push(['Antall vinduer', g('antall_vinduer')]);
+      lines.push(['Vask av vinduskarmer', fd.get('karmer') ? 'Ja (gratis)' : 'Nei']);
+      lines.push(['Type', g('vindus_type')]);
+    } else if (s === 'maling') {
+      lines.push(['Skal males', g('maling_hva')]);
+      lines.push(['Areal (m²)', g('areal')]);
+      if (!this.state.budgetUnknown) { lines.push(['Budsjett (kr)', g('budsjett')]); }
+      else { lines.push(['Budsjett', 'Vet ikke ennå']); }
+    } else if (s === 'garasje') {
+      lines.push(['Hva skal fjernes', g('garasje_beskrivelse')]);
+      lines.push(['Noe skal rives', fd.get('rives') ? 'Ja' : 'Nei']);
+    } else if (s === 'hage') {
+      lines.push(['Beskrivelse', g('hage_beskrivelse')]);
+    } else if (s === 'annet') {
+      lines.push(['Beskrivelse', g('annet_beskrivelse')]);
+    }
+    lines.push(['Navn', (g('fornavn') + ' ' + g('etternavn')).trim()]);
+    lines.push(['Mobil', g('mobil')]);
+    lines.push(['E-post', g('epost')]);
+    lines.push(['Adresse', g('adresse')]);
+    if (g('melding')) { lines.push(['Melding', g('melding')]); }
+    if (this.state.imagePreview) { lines.push(['Bilde', 'Lastet opp (sendes med skjema)']); }
+
+    const summaryLines = lines.filter(l => l[1]).map(l => ({ label: l[0], value: l[1] }));
+
+    // Bygg strukturert henvendelse og lagre den i datalaget.
+    // Denne dukker opp i admin-dashbordet (Admin.dc.html) — ingen e-post.
+    const record = {
+      service: s,
+      serviceLabel: labels[s] || 'Annet',
+      fornavn: g('fornavn'), etternavn: g('etternavn'),
+      mobil: g('mobil'), epost: g('epost'), adresse: g('adresse'),
+      melding: g('melding'), hasImage: !!this.state.imagePreview,
+      details: {}
+    };
+    if (s === 'vindusvask') { record.details = { antallVinduer: g('antall_vinduer'), karmer: !!fd.get('karmer'), type: g('vindus_type') }; }
+    else if (s === 'maling') { record.details = { hva: g('maling_hva'), areal: g('areal'), budsjett: this.state.budgetUnknown ? 'Vet ikke' : g('budsjett') }; }
+    else if (s === 'garasje') { record.details = { beskrivelse: g('garasje_beskrivelse'), rives: !!fd.get('rives') }; }
+    else if (s === 'hage') { record.details = { beskrivelse: g('hage_beskrivelse') }; }
+    else if (s === 'annet') { record.details = { beskrivelse: g('annet_beskrivelse') }; }
+
+    try { if (window.CleanlyData) { window.CleanlyData.addEnquiry(record); } } catch (err) {}
+
+    this.setState({ submitted: true, summaryLines });
+    try {
+      const el = document.getElementById('skjema');
+      if (el) { window.scrollTo({ top: el.offsetTop - 80, behavior: 'smooth' }); }
+    } catch (err) {}
+  }
+
+  resetForm() { this.setState({ service: '', budgetUnknown: false, imagePreview: null, submitted: false, summaryLines: [] }); }
+
+  renderVals() {
+    const s = this.state.service;
+    const opts = [
+      { id: 'vindusvask', label: 'Vindusvask' },
+      { id: 'maling', label: 'Maling av hus og gjerde' },
+      { id: 'garasje', label: 'Garasjerydding og bortkjøring' },
+      { id: 'hage', label: 'Hagearbeid' },
+      { id: 'annet', label: 'Annet oppdrag' }
+    ];
+    const serviceOptions = opts.map(o => {
+      const active = s === o.id;
+      const cardStyle = 'display:flex;align-items:center;text-align:left;padding:15px 18px;border-radius:14px;cursor:pointer;font-family:inherit;font-size:16px;font-weight:700;transition:all .15s;border:2px solid ' + (active ? '#2B87C8' : '#CFEBFB') + ';background:' + (active ? '#2B87C8' : '#F2FAFE') + ';color:' + (active ? '#fff' : '#123047') + ';';
+      return { id: o.id, label: o.label, active, cardStyle, onClick: () => this.selectService(o.id) };
+    });
+    return {
+      serviceOptions,
+      hasService: !!s,
+      isVindusvask: s === 'vindusvask',
+      isMaling: s === 'maling',
+      isGarasje: s === 'garasje',
+      isHage: s === 'hage',
+      isAnnet: s === 'annet',
+      budgetUnknown: this.state.budgetUnknown,
+      showBudget: !this.state.budgetUnknown,
+      toggleBudget: () => this.toggleBudget(),
+      onImageChange: e => this.onImageChange(e),
+      hasImage: !!this.state.imagePreview,
+      previewImg: this.state.imagePreview
+        ? React.createElement('img', { src: this.state.imagePreview, alt: 'Forhåndsvisning av opplastet bilde', style: { width: '96px', height: '96px', objectFit: 'cover', borderRadius: '12px', border: '2px solid #CFEBFB' } })
+        : null,
+      clearImage: () => this.clearImage(),
+      onSubmit: e => this.onSubmit(e),
+      submitted: this.state.submitted,
+      notSubmitted: !this.state.submitted,
+      summaryLines: this.state.summaryLines,
+      resetForm: () => this.resetForm(),
+      isMobile: this.state.isMobile,
+      isDesktop: !this.state.isMobile,
+      menuOpen: this.state.menuOpen,
+      toggleMenu: () => this.setState(x => ({ menuOpen: !x.menuOpen })),
+      closeMenu: () => this.setState({ menuOpen: false })
+    };
+  }
+}
+</script>
+</body>
+</html>
